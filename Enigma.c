@@ -28,6 +28,14 @@ alphabetIndex (char target)
     }
 }
 
+void printRotor(const char *rotor)
+{
+  for (int i = 0; i < 26; ++i)
+  {
+    printf("%c", rotor[i] + 'A');
+  }
+}
+
 char
 rotorIndex (const char *rotor, char target)
 {
@@ -39,6 +47,11 @@ rotorIndex (const char *rotor, char target)
     }
   else
     {
+      printf("YOU FAILED WITH %c???\n", target + 'A');
+      printRotor(rotor);
+
+
+
       return -1;
     }
 }
@@ -112,7 +125,7 @@ main (int argc, char *argv[])
   memcpy (rotor1, ROTOR_A, sizeof (ROTOR_A));
   memcpy (rotor2, ROTOR_B, sizeof (ROTOR_A));
   memcpy (rotor3, ROTOR_C, sizeof (ROTOR_A));
-  memcpy (rotor3, REFLECTOR, sizeof (REFLECTOR));
+  memcpy (reflector, REFLECTOR, sizeof (REFLECTOR));
 
   for (int i = 0; i < 26; ++i)
     {
