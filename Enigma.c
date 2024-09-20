@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "rotors.h"
-
 // A char was missing from each of the rotors but I added them back randomly
 // Made sure to make the arrays size 26 so there is no null terminator
 const char ROTOR_A[26] = "EKMFGHDQVZXRUTIABJSYCLWPON";
