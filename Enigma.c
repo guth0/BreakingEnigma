@@ -18,7 +18,7 @@ alphabetIndex (char target)
 {
   if (target >= 'A' && target <= 'Z')
     {
-      return (char)(target - 'A');
+      return target - 'A';
     }
   else
     {
@@ -26,14 +26,16 @@ alphabetIndex (char target)
     }
 }
 
-void printRotor(const char *rotor)
+void
+printRotor (const char *rotor)
 {
   for (int i = 0; i < 26; ++i)
-  {
-    printf("%c", rotor[i] + 'A');
-  }
+    {
+      printf ("%c", rotor[i] + 'A');
+    }
 }
 
+/*  // I have no idea why this doesn't work
 char
 rotorIndex (const char *rotor, char target)
 {
@@ -41,18 +43,30 @@ rotorIndex (const char *rotor, char target)
 
   if (ptr != NULL)
     {
-      return (char)(ptr - rotor);
+      return ptr - rotor;
     }
   else
     {
-      printf("YOU FAILED WITH %c???\n", target + 'A');
-      printRotor(rotor);
-
-
-
       return -1;
     }
 }
+//*/
+
+///*
+char
+rotorIndex (const char *rotor, char target)
+{
+  for (int i = 0; i < 26; ++i)
+    {
+      if (target == rotor[i])
+        {
+          return i;
+        }
+    }
+
+  return -1;
+}
+//*/
 
 void
 createPlug (char *board, char plug1, char plug2)
@@ -112,17 +126,18 @@ main (int argc, char *argv[])
   // As they spin, they increase, so we ADD rotor1_pos to the input and THEN
   // put it into the map
   int rotor1_pos = 0;
-  int rotor2_pos = 1;
-  int rotor3_pos = 2;
+  int rotor2_pos = 0;
+  int rotor3_pos = 0;
   // Reflector DOES NOT rotate
 
   char rotor1[26];
   char rotor2[26];
   char rotor3[26];
   char reflector[26];
+
   memcpy (rotor1, ROTOR_A, sizeof (ROTOR_A));
-  memcpy (rotor2, ROTOR_B, sizeof (ROTOR_A));
-  memcpy (rotor3, ROTOR_C, sizeof (ROTOR_A));
+  memcpy (rotor2, ROTOR_B, sizeof (ROTOR_B));
+  memcpy (rotor3, ROTOR_C, sizeof (ROTOR_C));
   memcpy (reflector, REFLECTOR, sizeof (REFLECTOR));
 
   for (int i = 0; i < 26; ++i)
@@ -133,6 +148,8 @@ main (int argc, char *argv[])
       reflector[i] -= 'A';
     }
 
+  // these are all random (just for testing)
+  // need to make plugs/rotors command line args after I get it working
   char plugs[][2] = { { 1, 3 }, { 4, 8 }, { 2, 5 }, { 6, 20 }, { 19, 0 } };
 
   char numPlugs = sizeof (plugs) / sizeof (plugs[0]);
@@ -140,30 +157,29 @@ main (int argc, char *argv[])
   char plugboard[26];
   createPlugboard (plugs, numPlugs, plugboard);
 
-  char input[] = "BR";
   char output[strlen (argv[1]) + 1];
 
   // DEBUGGING
-  // for (int i = 0; i < 26; i++)
-  // {
-  //     printf("%d, ", rotor1[i]);
-  // }
-  // printf("\n");
-  // for (int i = 0; i < 26; i++)
-  // {
-  //     printf("%d, ", rotor2[i]);
-  // }
-  // printf("\n");
-  // for (int i = 0; i < 26; i++)
-  // {
-  //     printf("%d, ", rotor3[i]);
-  // }
-  // printf("\n");
-  // for (int i = 0; i < 26; i++)
-  // {
-  //     printf("%d, ", REFLECTOR[i]);
-  // }
-  // printf("\n");
+  for (int i = 0; i < 26; i++)
+    {
+      printf ("%d, ", rotor1[i]);
+    }
+  printf ("\n");
+  for (int i = 0; i < 26; i++)
+    {
+      printf ("%d, ", rotor2[i]);
+    }
+  printf ("\n");
+  for (int i = 0; i < 26; i++)
+    {
+      printf ("%d, ", rotor3[i]);
+    }
+  printf ("\n");
+  for (int i = 0; i < 26; i++)
+    {
+      printf ("%d, ", reflector[i]);
+    }
+  printf ("\n");
   // DEBUGGING
 
   for (int i = 0; i < strlen (argv[1]); i++)
@@ -185,20 +201,22 @@ main (int argc, char *argv[])
       index = reflector[index];
       printf (" %d ->", index);
 
-      index = rotorIndex (rotor3, (index + rotor3_pos) % 26);
+      index = rotorIndex (rotor3, index) + rotor3_pos % 26;
       printf (" %d ->", index);
-      index = rotorIndex (rotor2, (index + rotor2_pos) % 26);
+      index = rotorIndex (rotor2, index) + rotor2_pos % 26;
       printf (" %d ->", index);
-      index = rotorIndex (rotor1, (index + rotor1_pos) % 26);
+      index = rotorIndex (rotor1, index) + rotor1_pos % 26;
       printf (" %d ->", index);
 
       index = plugboard[index];
       printf (" %d", index);
 
       output[i] = index + 'A';
-      printf (" = %c\n", output[i]);
+      printf (" = %c", output[i]);
 
-      spinRotors (&rotor1_pos, &rotor2_pos, &rotor3_pos);
+      printf ("   r1:%d r2:%d r3:%d\n", rotor1_pos, rotor2_pos, rotor3_pos);
+
+      // spinRotors (&rotor1_pos, &rotor2_pos, &rotor3_pos);
     }
 
   output[strlen (argv[1])] = '\0';
