@@ -103,8 +103,8 @@ int main(int argc, char *argv[]) {
   // put it into the map
 
   int r1counter = 0;
-  int r2counter = 0;
-  int r3counter = 0;
+  int r2counter = 1;
+  int r3counter = 2;
 
   char rotor1[26];
   char rotor2[26];

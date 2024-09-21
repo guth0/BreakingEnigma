@@ -16,7 +16,13 @@ void shuffle(char *array, size_t n) {
   for (int i = 0; i < n - 1; ++i) {
     // generate a random number
     int rnd = rand();
-    int j = rnd % (n - (i * 2)) + 1;
+    int j;
+
+    if (i < n / 2) {
+      j = rnd % (n - (i * 2)) + 1;
+    } else {
+      j = 1;
+    }
     // j \in [1, numUntouched]
 
     // find the jth untouched number
@@ -39,19 +45,19 @@ void shuffle(char *array, size_t n) {
   }
 }
 
-char isValidReflector(char *arr) { 
-  
-  for (int i = 0; i< 26; ++i)
-  {
+char isValidReflector(char *arr) {
+
+  for (int i = 0; i < 26; ++i) {
     char c = arr[i];
-    if (arr[c - 'A'] != i + 'A')
-    {
+    if (arr[c - 'A'] != i + 'A') {
+      printf("arr[%d] = %c, arr['%c' - 'A'] != %d + 'A'", i, c, c, i);
       return 1;
     }
     // if the char at arr[i] is c, then the char at arr[c - 'A'] is i + 'A'
   }
 
-  return 0; }
+  return 0;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -69,7 +75,8 @@ int main(int argc, char *argv[]) {
   }
   printf("\"\n");
 
-  printf("This %s a valid reflector\n", (isValidReflector(reflector) == 0) ? "IS" : "IS NOT");
+  printf("This %s a valid reflector\n",
+         (isValidReflector(reflector) == 0) ? "IS" : "IS NOT");
 
   free(reflector);
 
