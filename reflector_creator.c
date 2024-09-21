@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include "time.h"
 
 void swap(char *arr, int index1, int index2) {
   char temp = arr[index1];
@@ -8,6 +9,8 @@ void swap(char *arr, int index1, int index2) {
 }
 
 void shuffle(char *array, size_t n) {
+
+  srand(time(NULL));
 
   // we can do n - 1 here because the final character will always be shuffled
   for (int i = 0; i < n - 1; ++i) {
