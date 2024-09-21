@@ -103,8 +103,8 @@ int main(int argc, char *argv[]) {
   // As they spin, they increase, so we ADD rotor1_pos to the input and THEN
   // put it into the map
   int rotor1_pos = 0;
-  int rotor2_pos = 0;
-  int rotor3_pos = 0;
+  int rotor2_pos = 1;
+  int rotor3_pos = 2;
   // Reflector DOES NOT rotate
 
   char rotor1[26];
@@ -172,11 +172,11 @@ int main(int argc, char *argv[]) {
     index = reflector[index];
     printf(" %d ->", index);
 
-    index = rotorIndex(rotor3, index) + rotor3_pos % 26;
+    index = rotorIndex(rotor3, (index + rotor3_pos) % 26);
     printf(" %d ->", index);
-    index = rotorIndex(rotor2, index) + rotor2_pos % 26;
+    index = rotorIndex(rotor2, (index + rotor2_pos) % 26);
     printf(" %d ->", index);
-    index = rotorIndex(rotor1, index) + rotor1_pos % 26;
+    index = rotorIndex(rotor1, (index + rotor1_pos) % 26);
     printf(" %d ->", index);
 
     index = plugboard[index];
