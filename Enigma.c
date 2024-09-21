@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "rotors.h"
+
 // A char was missing from each of the rotors but I added them back randomly
 // Made sure to make the arrays size 26 so there is no null terminator
 const char ROTOR_A[26] = "EKMFGHDQVZXRUTIABJSYCLWPON";
@@ -79,33 +81,30 @@ void createPlugboard(const char plugs[][2], int numPlugs,
   }
 }
 
-void spinRotors(int *rotor1, int *rotor2, int *rotor3) {
-  int pos1 = *rotor1;
-  int pos2 = *rotor2;
-  int pos3 = *rotor3;
+void spinRotors(char *r1, char *r2, char *r3, int *r1count, int *r2count,
+                int *r3count) {
 
-  if (NOTCH1 == pos1) {
-    pos2 = (pos2 + 1) % 26;
-    if (NOTCH2 == pos2) {
-      pos3 = (pos3 + 1) % 26;
+  if (NOTCH1 == *r1count) {
+    *r2count = (*r2count + 1) % 26;
+    rotate(r2, 1, 26);
+    if (NOTCH2 == *r2count) {
+      *r3count = (*r3count + 1) % 26;
+      rotate(r3, 1, 26);
     }
   }
 
-  pos1 = (pos1 + 1) % 26;
-
-  *rotor1 = pos1;
-  *rotor2 = pos2;
-  *rotor3 = pos3;
+  *r1count = (*r1count + 1) % 26;
+  rotate(r1, 1, 26);
 }
 
 int main(int argc, char *argv[]) {
 
   // As they spin, they increase, so we ADD rotor1_pos to the input and THEN
   // put it into the map
-  int rotor1_pos = 0;
-  int rotor2_pos = 1;
-  int rotor3_pos = 2;
-  // Reflector DOES NOT rotate
+
+  int r1counter = 0;
+  int r2counter = 0;
+  int r3counter = 0;
 
   char rotor1[26];
   char rotor2[26];
@@ -162,21 +161,21 @@ int main(int argc, char *argv[]) {
     index = plugboard[index];
     printf(" %d ->", index);
 
-    index = rotor1[(index + rotor1_pos) % 26];
+    index = rotor1[index];
     printf(" %d ->", index);
-    index = rotor2[(index + rotor2_pos) % 26];
+    index = rotor2[index];
     printf(" %d ->", index);
-    index = rotor3[(index + rotor3_pos) % 26];
+    index = rotor3[index];
     printf(" %d ->", index);
 
     index = reflector[index];
     printf(" %d ->", index);
 
-    index = rotorIndex(rotor3, (index + rotor3_pos) % 26);
+    index = rotorIndex(rotor3, index);
     printf(" %d ->", index);
-    index = rotorIndex(rotor2, (index + rotor2_pos) % 26);
+    index = rotorIndex(rotor2, index);
     printf(" %d ->", index);
-    index = rotorIndex(rotor1, (index + rotor1_pos) % 26);
+    index = rotorIndex(rotor1, index);
     printf(" %d ->", index);
 
     index = plugboard[index];
@@ -185,9 +184,9 @@ int main(int argc, char *argv[]) {
     output[i] = index + 'A';
     printf(" = %c", output[i]);
 
-    printf("   r1:%d r2:%d r3:%d\n", rotor1_pos, rotor2_pos, rotor3_pos);
+    printf("   r1:%d r2:%d r3:%d\n", r1counter, r2counter, r3counter);
 
-    // spinRotors (&rotor1_pos, &rotor2_pos, &rotor3_pos);
+    spinRotors(rotor1, rotor2, rotor3, &r1counter, &r2counter, &r3counter);
   }
 
   output[strlen(argv[1])] = '\0';
