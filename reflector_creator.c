@@ -2,7 +2,6 @@
 #include "stdlib.h"
 #include "time.h"
 
-
 void swap(char *c1, char *c2) {
   char temp = *c1;
   *c1 = *c2;
@@ -11,18 +10,19 @@ void swap(char *c1, char *c2) {
 
 void shuffle(char *array, size_t n) {
 
-  srand(time(NULL));
-
-  // we can do n - 1 here because the final character will always be shuffled
-
   if (n % 2 != 0) {
     fprintf(stderr, "String length must be even");
     return;
   }
 
+  srand(time(NULL));
+
   for (int i = 0; i < n / 2; ++i) {
     int c1, c2;
 
+    // make c1, c2 random numbers
+    // c1 must be between 0 and the number of unmoved letters
+    // c2 must be between 0 and 1 - number of unmoved letters
     int rnd = rand();
     c1 = rnd % (n - (i * 2));
     rnd = rand();
@@ -36,19 +36,27 @@ void shuffle(char *array, size_t n) {
       // if letter is in original spot
       if (array[j] == j + 'A') {
 
+        // if c1 == 0, then we have found the c1st unmoved letter
         if (c1 == 0) {
 
-	  c2++;
+          // increment c2 here because the c1st unmoved letter
+	  // does not count for c2
+          c2++;
+	  // I know this ^^ is bad
+	  // but it makes it more readable than the alterantive
+
           p1 = &array[j];
 
+	  // if c2 == 0, then we have found the c2nd* unmoved letter
+	  // * -> not including the c1st
         } else if (c2 == 0) {
 
           p2 = &array[j];
-
         }
 
-	c1--;
-	c2--;
+	// decrement the counters
+        c1--;
+        c2--;
       }
 
       j++;
