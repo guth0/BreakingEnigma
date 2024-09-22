@@ -1,0 +1,24 @@
+NOTES:
+  A key can NEVER come back as itself
+  Energy Pathing:
+    Battery -> Switch -> Plugboard -> Rotors -> Reflector -> Rotors -> Plugboard -> Switch -> Lightbulb -> Battery
+  Rotor Spins:
+    Fast Rotor (Right) Always spins on every button press
+    Medium Rotor (Middle) Spins once every 26 fast rotor rotations
+    Slow Rotor (Left) Spins once every 26 medium rotor rotations or 26*26 fast rotor rotations
+  Configurations:
+    Rotors:
+      Order of the Rotors (Machine comes with 5, they can be placed in any order)
+      Position of the Rotors (26 positions for each)
+      Positions of the notches (26 positions for the first two rotors)
+    Plugboard:
+      Any two letters can be swapped into another
+      Usually 7-10 plugs used but I will consider 0-13
+
+
+  Rotor Orders = 5 P 3 = 60
+  Rotor Positions = 26^3
+  Notch Positions = 26^2
+  Rotors total Possibilities = 712,882,560
+
+
