@@ -14,13 +14,18 @@ const char REFLECTOR[26] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
 const int NOTCH1 = 20;
 const int NOTCH2 = 22;
 
-void printRotor(const char *rotor) {
-  for (int i = 0; i < 26; ++i) {
-    printf("%c", rotor[i] + 'A');
-  }
+void
+printRotor (const char *rotor)
+{
+  for (int i = 0; i < 26; ++i)
+    {
+      printf ("%c", rotor[i] + 'A');
+    }
 }
 
-void createPlug(char *board, char plug1, char plug2) {
+void
+createPlug (char *board, char plug1, char plug2)
+{
   // if plug1 != board[plug1] && plug2 != board[plug2]: plug is invalid
   char temp = board[plug1];
   board[plug1] = board[plug2];
@@ -28,66 +33,114 @@ void createPlug(char *board, char plug1, char plug2) {
 }
 
 // plugs should be a 2*n matrix
-void createPlugboard(const char plugs[][2], int numPlugs,
-                     char *board) // board will always have size = 26
+void
+createPlugboard (const char plugs[][2], int numPlugs,
+                 char *board) // board will always have size = 26
 {
-  for (int i = 0; i < 26; i++) {
-    board[i] = i;
-  }
+  for (int i = 0; i < 26; i++)
+    {
+      board[i] = i;
+    }
 
-  for (int i = 0; i < numPlugs; i++) {
-    const char plug1 = plugs[i][0];
-    const char plug2 = plugs[i][1];
+  for (int i = 0; i < numPlugs; i++)
+    {
+      const char plug1 = plugs[i][0];
+      const char plug2 = plugs[i][1];
 
-    createPlug(board, plug1, plug2);
-  }
+      createPlug (board, plug1, plug2);
+    }
 }
 
-int main(int argc, char *argv[]) {
+int
+main (int argc, char *argv[])
+{
 
   char rotor1[] = "EKMFGHDQVZXRUTIABJSYCLWPON";
   char rotor2[] = "AJDKSIRUBLHXQTMOWZYVFCPNGE";
   char rotor3[] = "BDFHJLNPRTVKXZMOQSUWYACEGI";
   char reflector[] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
 
-  for (int i = 0; i < 26; ++i) {
-    rotor1[i] -= 'A';
-    rotor2[i] -= 'A';
-    rotor3[i] -= 'A';
-    reflector[i] -= 'A';
-  }
-
-  if (argc < 2) {
-    fprintf(stderr, "Invalid argument count");
-    return 1;
-  }
-
-  for (int i = 1; i < argc; ++i) {
-    if (argv[i][0] == '-') {
-      switch (argv[i][1]) {
-      case 'p':
-        // handle Plugboad
-        break;
-      case 'r':
-        // handle Rotors
-        break;
-      case 'h':
-        // give help
-        break;
-      default:
-        printf("Invalid Flag ");
-	break;
-      }
+  for (int i = 0; i < 26; ++i)
+    {
+      rotor1[i] -= 'A';
+      rotor2[i] -= 'A';
+      rotor3[i] -= 'A';
+      reflector[i] -= 'A';
     }
-  }
+
+  if (argc < 2)
+    {
+      fprintf (stderr, "Invalid argument count");
+      return 1;
+    }
+
+  for (int i = 1; i < argc; ++i)
+    {
+      if (argv[i][0] == '-')
+        {
+          switch (argv[i][1])
+            {
+            case 'p':
+              // handle Plugboad
+              break;
+            case 'r':
+              // handle Rotors
+              // if just r, then the next arg should be just
+	      // numbers for the other rotors
+              break;
+            case 'h':
+              // give help
+              break;
+       default:
+              printf ("Invalid Flag ");
+              break;
+            }
+        }
+    }
 
   //  char *Enigma(char *string, char *r1, char *r2, char *r3, char *rfl, int
   //  r1pos, int r2pos, int r3pos, char plugboard[26], const int notch1,
   //        const int notch2) {
 
+  // give these all default values but overwrite them with user input
   char *string;
+  char *r1, *r2, *r3, *rfl;
+  int r1pos, r2pos, r3pos;
+  char plugboard[26];
+  int notch1, notch2;
 
-  Enigma();
+  Enigma ();
 
   return 0;
 }
+
+
+
+/*
+
+
+usage: grep [-abcdDEFGHhIiJLlMmnOopqRSsUVvwXxZz] [-A num] [-B num] [-C[num]]
+	[-e pattern] [-f file] [--binary-files=value] [--color=when]
+	[--context[=num]] [--directories=action] [--label] [--line-buffered]
+	[--null] [pattern] [file ...]
+
+
+usage: enigma [-r num(3)] [-r1/r2/r3=cypher] [-refl/p([num][=cypher])] [--config=file] [-o file] [text] [file ...]
+
+
+
+*/
+
+/*
+
+rotor1 "EKMFGHDQVZXRUTIABJSYCLWPON" 0
+rotor2 "AJDKSIRUBLHXQTMOWZYVFCPNGE" 1
+rotor3
+reflector
+plugboard
+file 
+
+
+
+*/
+
