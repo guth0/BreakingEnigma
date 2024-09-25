@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ROTORS_H
+#define ROTORS_H
 
 void reverse(char *arr, int start, int end)
 {
@@ -22,3 +23,5 @@ void rotate(char *arr, int d, int n)
 
   // rotated!! :)
 }
+
+#endif
