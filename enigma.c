@@ -12,6 +12,8 @@ const char ROTOR_5[27] = "LZIJTBYNREOAPUVDWHXCKQMGFS";
 const char REFLECTOR_1[27] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
 const char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
 
+const char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 void assignRotor(char *r, int rNum) {
 
   switch (rNum) {
@@ -75,27 +77,21 @@ int main(int argc, char *argv[]) {
 
   char *string;
 
-  // 27 so there is a space for a null terminator
-  char r1[27];
-  char r2[27];
-  char r3[27];
-  char rfl[27];
+  struct config cfg;
 
   // copy in default cyphers
-  strncpy(r1, ROTOR_1, 27);
-  strncpy(r2, ROTOR_2, 27);
-  strncpy(r3, ROTOR_3, 27);
-  strncpy(rfl, REFLECTOR_1, 27);
+  strncpy(cfg.r1, ROTOR_1, 27);
+  strncpy(cfg.r2, ROTOR_2, 27);
+  strncpy(cfg.r3, ROTOR_3, 27);
+  strncpy(cfg.rfl, REFLECTOR_1, 27);
+  strncpy(cfg.plugboard, ALPHABET, 27);
 
   // Random Default Values
-  int r1pos = 0;
-  int r2pos = 1;
-  int r3pos = 2;
-
-  char plugboard[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-  int notch1 = 5;
-  int notch2 = 10;
+  cfg.r1pos = 0;
+  cfg.r2pos = 0;
+  cfg.r3pos = 0;
+  cfg.notch1 = 5;
+  cfg.notch2 = 10;
 
   int *ptr; // temp variable used for switch cases
 
@@ -116,7 +112,7 @@ int main(int argc, char *argv[]) {
           return 2;
         }
 
-        strncpy(plugboard, argv[i + 1], 26);
+        strncpy(cfg.plugboard, argv[i + 1], 26);
         i++;
         break;
       case 'r':
@@ -127,9 +123,9 @@ int main(int argc, char *argv[]) {
           }
         }
 
-        assignRotor(r1, argv[i + 1][0] - '0');
-        assignRotor(r2, argv[i + 1][1] - '0');
-        assignRotor(r3, argv[i + 1][2] - '0');
+        assignRotor(cfg.r1, argv[i + 1][0] - '0');
+        assignRotor(cfg.r2, argv[i + 1][1] - '0');
+        assignRotor(cfg.r3, argv[i + 1][2] - '0');
 
         i++;
         break;
@@ -137,10 +133,10 @@ int main(int argc, char *argv[]) {
 
         switch (argv[i + 1][0]) {
         case '1':
-          strncpy(rfl, REFLECTOR_1, 26);
+          strncpy(cfg.rfl, REFLECTOR_1, 26);
           break;
         case '2':
-          strncpy(rfl, REFLECTOR_2, 26);
+          strncpy(cfg.rfl, REFLECTOR_2, 26);
           break;
         default:
           fprintf(stderr, "Invalid Reflector Number '%c'\n", argv[i + 1][0]);
@@ -152,13 +148,13 @@ int main(int argc, char *argv[]) {
       case 'p':
         switch (argv[i][2]) {
         case '1':
-          ptr = &r1pos;
+          ptr = &cfg.r1pos;
           break;
         case '2':
-          ptr = &r2pos;
+          ptr = &cfg.r2pos;
           break;
         case '3':
-          ptr = &r3pos;
+          ptr = &cfg.r3pos;
           break;
         default:
           fprintf(stderr, "Invalid Rotor Number '%s'\n", argv[i]);
@@ -181,10 +177,10 @@ int main(int argc, char *argv[]) {
 
         switch (argv[i][2]) {
         case '1':
-          ptr = &notch1;
+          ptr = &cfg.notch1;
           break;
         case '2':
-          ptr = &notch2;
+          ptr = &cfg.notch2;
           break;
         default:
           fprintf(stderr, "Invalid Notch Number '%s'\n", argv[i]);
@@ -219,7 +215,31 @@ int main(int argc, char *argv[]) {
         break;
       case 'h':
 
-        printf("Sorry I haven't made it yet :(\n");
+        printf(
+            "usage: enigma [-r [1-5](3)] [-p1/2/3 [0-25]] [-e [1-2]] "
+            "[-b=cypher] [-n1/2\n"
+            "[0-25]] [--config=file] [-o file] [-f file] [text]\n"
+            "\n"
+            "enigma is a recreation of the encryption tool used during WWII\n"
+            "\n"
+            "Command options:\n"
+            "  -r [1-5](3)		choose which of the 5 rotors\n"
+	    "			will be used in each slot\n"
+            "			  default is '-r 123'\n"
+            "  -e [1-2]		choose which of the 2 reflectors to use\n"
+	    "			  default is '-e 1'\n"
+            "  -b=[CYPHER]		define the CYPHER for the plugboard\n"
+            "			   default is the normal alphabet\n"
+            "  -p1/2/3 [0-25]	each rotor can be in 1 of 26 rotations\n"
+            "			  default is '-pX 0'\n"
+            "  -n1/2 [0-25]		rotors 1 & 2 have notches which\n"
+            "		        can be in 1 of 26 positions\n"
+            "			  default is '-n1 5 -n2 10'\n"
+            "  --config=file		select a file to load configurations "
+            "from\n"
+            "  -o 			select a file to use as output\n"
+            "  -f 			select a file to load as input\n"
+            "  -h			show this help message\n");
         return 0;
         break;
       default:
@@ -235,41 +255,40 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < 26; ++i) {
-    r1[i] -= 'A';
-    r2[i] -= 'A';
-    r3[i] -= 'A';
-    rfl[i] -= 'A';
-    plugboard[i] -= 'A';
+    cfg.r1[i] -= 'A';
+    cfg.r2[i] -= 'A';
+    cfg.r3[i] -= 'A';
+    cfg.rfl[i] -= 'A';
+    cfg.plugboard[i] -= 'A';
   }
 
-  if (r1pos != 0) {
-    rotate(r1, r1pos, 26);
+  if (cfg.r1pos != 0) {
+    rotate(cfg.r1, cfg.r1pos, 26);
   }
-  if (r2pos != 0) {
-    rotate(r2, r2pos, 26);
+  if (cfg.r2pos != 0) {
+    rotate(cfg.r2, cfg.r2pos, 26);
   }
-  if (r3pos != 0) {
-    rotate(r3, r3pos, 26);
+  if (cfg.r3pos != 0) {
+    rotate(cfg.r3, cfg.r3pos, 26);
   }
 
   if (verbose != 0) {
     printf("String: %s\n", string);
-    printf("r1 - %d: ", r1pos);
-    printCypher(r1);
-    printf("r2 - %d: ", r2pos);
-    printCypher(r2);
-    printf("r3 - %d: ", r3pos);
-    printCypher(r3);
+    printf("r1 - %d: ", cfg.r1pos);
+    printCypher(cfg.r1);
+    printf("r2 - %d: ", cfg.r2pos);
+    printCypher(cfg.r2);
+    printf("r3 - %d: ", cfg.r3pos);
+    printCypher(cfg.r3);
     printf("rfl: ");
-    printCypher(rfl);
+    printCypher(cfg.rfl);
     printf("PB: ");
-    printCypher(plugboard);
-    printf("n1: %d, n2: %d\n", notch1, notch2);
+    printCypher(cfg.plugboard);
+    printf("n1: %d, n2: %d\n", cfg.notch1, cfg.notch2);
   }
 
   char *output;
-  output = Enigma(string, r1, r2, r3, rfl, r1pos, r2pos, r3pos, plugboard,
-                  notch1, notch2);
+  output = Enigma(string, cfg);
 
   printf("%s\n", output);
 

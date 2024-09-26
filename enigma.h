@@ -6,6 +6,22 @@
 
 #include "rotors.h"
 
+struct config {
+  char r1[27];
+  char r2[27];
+  char r3[27];
+  char rfl[27];
+
+  char plugboard[27];
+
+  int r1pos;
+  int r2pos;
+  int r3pos;
+
+  int notch1;
+  int notch2;
+};
+
 char alphabetIndex(char target) {
   if (target >= 'A' && target <= 'Z') {
     return target - 'A';
@@ -42,10 +58,24 @@ void spinRotors(char *r1, char *r2, char *r3, int *r1count, int *r2count,
   rotate(r1, 1, 26);
 }
 
-char *Enigma(char *string, char r1[27], char r2[27], char r3[27], char rfl[27],
-             int r1pos, int r2pos, int r3pos, const char plugboard[27],
-             const int notch1, const int notch2) {
+/* // this is so fucking unreadable, I'm gonna continue with the one above
+void spinRotors(struct config *cfg) {
 
+  if (cfg->notch1 == cfg->r1pos) {
+    cfg->r2pos = (cfg->r2pos + 1) % 26;
+    rotate(cfg->r2, 1, 26);
+    if (cfg->notch2 == cfg->r2pos) {
+      cfg->r3pos = (cfg->r3pos + 1) % 26;
+      rotate(cfg->r3, 1, 26);
+    }
+  }
+
+  cfg->r1pos = (cfg->r1pos + 1) % 26;
+  rotate(cfg->r1, 1, 26);
+}
+*/
+
+char *Enigma(char *string, struct config cfg) {
 
   char *output = (char *)malloc(strlen(string) + 1);
 
@@ -60,23 +90,25 @@ char *Enigma(char *string, char r1[27], char r2[27], char r3[27], char rfl[27],
       continue;
     }
 
-    index = plugboard[index];
+    index = cfg.plugboard[index];
 
-    index = r1[index];
-    index = r2[index];
-    index = r3[index];
+    index = cfg.r1[index];
+    index = cfg.r2[index];
+    index = cfg.r3[index];
 
-    index = rfl[index];
+    index = cfg.rfl[index];
 
-    index = rotorIndex(r3, index);
-    index = rotorIndex(r2, index);
-    index = rotorIndex(r1, index);
+    index = rotorIndex(cfg.r3, index);
+    index = rotorIndex(cfg.r2, index);
+    index = rotorIndex(cfg.r1, index);
 
-    index = plugboard[index];
+    index = cfg.plugboard[index];
 
     output[i] = index + 'A';
 
-    spinRotors(r1, r2, r3, &r1pos, &r2pos, &r3pos, notch1, notch2);
+
+    // either this call is unreadable or the function itself is unreadable :(
+    spinRotors(cfg.r1, cfg.r2, cfg.r3, &cfg.r1pos, &cfg.r2pos, &cfg.r3pos, cfg.notch1, cfg.notch2);
   }
 
   output[strlen(string)] = '\0';
