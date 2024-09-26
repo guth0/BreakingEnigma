@@ -42,9 +42,10 @@ void spinRotors(char *r1, char *r2, char *r3, int *r1count, int *r2count,
   rotate(r1, 1, 26);
 }
 
-char *Enigma(char *string, char r1[26], char r2[26], char r3[26], char rfl[26], int r1pos,
-             int r2pos, int r3pos, const char plugboard[26], const int notch1,
-             const int notch2) {
+char *Enigma(char *string, char r1[27], char r2[27], char r3[27], char rfl[27],
+             int r1pos, int r2pos, int r3pos, const char plugboard[27],
+             const int notch1, const int notch2) {
+
 
   char *output = (char *)malloc(strlen(string) + 1);
 
@@ -52,9 +53,8 @@ char *Enigma(char *string, char r1[26], char r2[26], char r3[26], char rfl[26], 
 
     char letter = string[i];
     char index = alphabetIndex(letter);
-    
-    if (index == -1)
-    {
+
+    if (index == -1) {
       // Skip all non-alphabetical characters
       output[i] = letter;
       continue;
