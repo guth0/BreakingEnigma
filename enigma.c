@@ -297,8 +297,3 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
-
-/*
-usage: enigma [-r [1-5](3)] [-p1/2/3 [0-25]] [-e [1-2]] [-b=cypher] [-n1/2
-[0-25]] [--config=file] [-f file ...] [text]
-*/
