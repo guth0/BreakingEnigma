@@ -66,37 +66,9 @@ void printCypher(const char *c) {
   printf("\n");
 }
 
-int main(int argc, char *argv[]) {
-
-  if (argc < 2) {
-    fprintf(stderr, "Invalid argument count\n");
-    return 1;
-  }
-
-  // give these all default values but overwrite them with user input
-
-  char *string;
-
-  struct config cfg;
-
-  // copy in default cyphers
-  strncpy(cfg.r1, ROTOR_1, 27);
-  strncpy(cfg.r2, ROTOR_2, 27);
-  strncpy(cfg.r3, ROTOR_3, 27);
-  strncpy(cfg.rfl, REFLECTOR_1, 27);
-  strncpy(cfg.plugboard, ALPHABET, 27);
-
-  // Random Default Values
-  cfg.r1pos = 0;
-  cfg.r2pos = 0;
-  cfg.r3pos = 0;
-  cfg.notch1 = 5;
-  cfg.notch2 = 10;
-
+char parseArgs(int argc, char *argv[], struct config *cfg, char *string)
+{
   int *ptr; // temp variable used for switch cases
-
-  // flags
-  char verbose = 0;
 
   for (int i = 1; i < argc; ++i) {
     if (argv[i][0] == '-') {
@@ -112,7 +84,7 @@ int main(int argc, char *argv[]) {
           return 2;
         }
 
-        strncpy(cfg.plugboard, argv[i + 1], 26);
+        strncpy(cfg->plugboard, argv[i + 1], 26);
         i++;
         break;
       case 'r':
@@ -123,9 +95,9 @@ int main(int argc, char *argv[]) {
           }
         }
 
-        assignRotor(cfg.r1, argv[i + 1][0] - '0');
-        assignRotor(cfg.r2, argv[i + 1][1] - '0');
-        assignRotor(cfg.r3, argv[i + 1][2] - '0');
+        assignRotor(cfg->r1, argv[i + 1][0] - '0');
+        assignRotor(cfg->r2, argv[i + 1][1] - '0');
+        assignRotor(cfg->r3, argv[i + 1][2] - '0');
 
         i++;
         break;
@@ -133,10 +105,10 @@ int main(int argc, char *argv[]) {
 
         switch (argv[i + 1][0]) {
         case '1':
-          strncpy(cfg.rfl, REFLECTOR_1, 26);
+          strncpy(cfg->rfl, REFLECTOR_1, 26);
           break;
         case '2':
-          strncpy(cfg.rfl, REFLECTOR_2, 26);
+          strncpy(cfg->rfl, REFLECTOR_2, 26);
           break;
         default:
           fprintf(stderr, "Invalid Reflector Number '%c'\n", argv[i + 1][0]);
@@ -148,13 +120,13 @@ int main(int argc, char *argv[]) {
       case 'p':
         switch (argv[i][2]) {
         case '1':
-          ptr = &cfg.r1pos;
+          ptr = &cfg->r1pos;
           break;
         case '2':
-          ptr = &cfg.r2pos;
+          ptr = &cfg->r2pos;
           break;
         case '3':
-          ptr = &cfg.r3pos;
+          ptr = &cfg->r3pos;
           break;
         default:
           fprintf(stderr, "Invalid Rotor Number '%s'\n", argv[i]);
@@ -177,10 +149,10 @@ int main(int argc, char *argv[]) {
 
         switch (argv[i][2]) {
         case '1':
-          ptr = &cfg.notch1;
+          ptr = &cfg->notch1;
           break;
         case '2':
-          ptr = &cfg.notch2;
+          ptr = &cfg->notch2;
           break;
         default:
           fprintf(stderr, "Invalid Notch Number '%s'\n", argv[i]);
@@ -202,7 +174,7 @@ int main(int argc, char *argv[]) {
         i++;
         break;
       case 'v':
-        verbose = 1;
+        cfg->verbose = 1;
         break;
       case 'f':
         fprintf(stderr, "File input is not yet supported\n");
@@ -240,7 +212,7 @@ int main(int argc, char *argv[]) {
             "  -o 			select a file to use as output\n"
             "  -f 			select a file to load as input\n"
             "  -h			show this help message\n");
-        return 0;
+        return 1;
         break;
       default:
         printf("Invalid flag '%s'\nUse 'enigma -h' for useage\n", argv[i]);
@@ -252,6 +224,47 @@ int main(int argc, char *argv[]) {
       string = (char *)malloc(strlen(argv[i]) * sizeof(char));
       strcpy(string, argv[i]);
     }
+  }
+
+  return 0;
+}
+
+int main(int argc, char *argv[]) {
+
+  if (argc < 2) {
+    fprintf(stderr, "Invalid argument count\n");
+    return 1;
+  }
+
+  // give these all default values but overwrite them with user input
+
+  char *string;
+
+  struct config cfg;
+
+  // copy in default cyphers
+  strncpy(cfg.r1, ROTOR_1, 27);
+  strncpy(cfg.r2, ROTOR_2, 27);
+  strncpy(cfg.r3, ROTOR_3, 27);
+  strncpy(cfg.rfl, REFLECTOR_1, 27);
+  strncpy(cfg.plugboard, ALPHABET, 27);
+
+  // Random Default Values
+  cfg.r1pos = 0;
+  cfg.r2pos = 0;
+  cfg.r3pos = 0;
+  cfg.notch1 = 5;
+  cfg.notch2 = 10;
+
+
+  // flags
+  cfg.verbose = 0;
+
+  char retVal = parseArgs(argc, argv, &cfg, string);
+
+  if(retVal != 0)
+  {
+    return retVal;
   }
 
   for (int i = 0; i < 26; ++i) {
@@ -272,7 +285,7 @@ int main(int argc, char *argv[]) {
     rotate(cfg.r3, cfg.r3pos, 26);
   }
 
-  if (verbose != 0) {
+  if (cfg.verbose != 0) {
     printf("String: %s\n", string);
     printf("r1 - %d: ", cfg.r1pos);
     printCypher(cfg.r1);
