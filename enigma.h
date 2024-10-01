@@ -20,6 +20,10 @@ struct config {
 
   int notch1;
   int notch2;
+
+  //flags
+
+  char verbose;
 };
 
 char alphabetIndex(char target) {
