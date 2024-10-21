@@ -1,2 +1,2 @@
 # BreakingEnigma
-Recreating the Enigma (in C) and the Bombe (in ASM)
+Recreating the Enigma and the Bombe
