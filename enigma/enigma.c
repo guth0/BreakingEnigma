@@ -200,7 +200,7 @@ char parseArgs(int argc, char *argv[], struct config *cfg, char *string)
             "			  default is '-r 123'\n"
             "  -e [1-2]		choose which of the 2 reflectors to use\n"
 	    "			  default is '-e 1'\n"
-            "  -b=[CYPHER]		define the CYPHER for the plugboard\n"
+            "  -b [CYPHER]		define the CYPHER for the plugboard\n"
             "			   default is the normal alphabet\n"
             "  -p1/2/3 [0-25]	each rotor can be in 1 of 26 rotations\n"
             "			  default is '-pX 0'\n"
