@@ -209,6 +209,7 @@ char parseArgs(int argc, char *argv[], struct config *cfg, char *string)
             "			  default is '-n1 5 -n2 10'\n"
             "  --config=file		select a file to load configurations "
             "from\n"
+	    "  -v			verbose output\n"
             "  -o 			select a file to use as output\n"
             "  -f 			select a file to load as input\n"
             "  -h			show this help message\n");
