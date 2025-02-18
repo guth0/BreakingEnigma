@@ -24,6 +24,8 @@ struct config {
   //flags
 
   char verbose;
+
+  // I want to remove the flags from this config struct for use in the Bombe
 };
 
 char alphabetIndex(char target) {
@@ -46,7 +48,7 @@ char rotorIndex(const char *rotor, char target) {
   return -1;
 }
 
-void spinRotors(char *r1, char *r2, char *r3, int *r1count, int *r2count,
+void spinRotors(char r1[27], char r2[27], char r3[27], int *r1count, int *r2count,
                 int *r3count, const int notch1, const int notch2) {
 
   if (notch1 == *r1count) {
@@ -79,7 +81,7 @@ void spinRotors(struct config *cfg) {
 }
 */
 
-char *Enigma(char *string, struct config cfg) {
+char *Enigma(char *string, struct config *cfg) {
 
   char *output = (char *)malloc(strlen(string) + 1);
 
@@ -94,25 +96,25 @@ char *Enigma(char *string, struct config cfg) {
       continue;
     }
 
-    index = cfg.plugboard[index];
+    index = cfg->plugboard[index];
 
-    index = cfg.r1[index];
-    index = cfg.r2[index];
-    index = cfg.r3[index];
+    index = cfg->r1[index];
+    index = cfg->r2[index];
+    index = cfg->r3[index];
 
-    index = cfg.rfl[index];
+    index = cfg->rfl[index];
 
-    index = rotorIndex(cfg.r3, index);
-    index = rotorIndex(cfg.r2, index);
-    index = rotorIndex(cfg.r1, index);
+    index = rotorIndex(cfg->r3, index);
+    index = rotorIndex(cfg->r2, index);
+    index = rotorIndex(cfg->r1, index);
 
-    index = cfg.plugboard[index];
+    index = cfg->plugboard[index];
 
     output[i] = index + 'A';
 
 
     // either this call is unreadable or the function itself is unreadable :(
-    spinRotors(cfg.r1, cfg.r2, cfg.r3, &cfg.r1pos, &cfg.r2pos, &cfg.r3pos, cfg.notch1, cfg.notch2);
+    spinRotors(cfg->r1, cfg->r2, cfg->r3, &cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1, cfg->notch2);
   }
 
   output[strlen(string)] = '\0';
