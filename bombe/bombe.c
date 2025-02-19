@@ -1,4 +1,5 @@
 #include "../enigma/enigma.h"
+#include "../enigma/rotors.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -105,6 +106,8 @@ shortEnigma (char *crib, char *cypher, struct config cfg)
 // 	stops at the first incorrect letter
 // 	returns 1 if encyrpted crib = cypher, 0 if not
 // 	can't have cfg passed by pointer
+//
+// This MUST recieve a cfg that has all rotors at position 0!
 int
 testRotors (char *crib, char *cypher, struct config *cfg)
 {
@@ -125,28 +128,36 @@ testRotors (char *crib, char *cypher, struct config *cfg)
 
   // Rotor Loop
 
-  for (int i = 0; i < 26; ++i)
+  for (int r1 = 0; r1 < 26; ++r1) // rotor 1 position
     {
-      for (int j = 0; j < 26; ++j)
+      rotate (cfg->r1, 1, 26);
+      for (int r2 = 0; r2 < 26; ++r2) // rotor 2 position
         {
-          for (int k = 0; k < 26; ++k)
+          rotate (cfg->r2, 1, 26);
+          for (int r3 = 0; r3 < 26; ++r3) // rotor 3 position
             {
+              rotate (cfg->r3, 1, 26);
 
-	      
-              // Notch Loop
-	       
-	      // FOR  1st  notch
-		   //  2nd notch 	
+              // NOTCHES
+              for (int n1 = 0; (n1 - r1 + 26) % 26 <= strlen (crib);
+                   ++n1) // notch 1 position
+                {
+                  int notch1Hits
+                      = (int)(strlen (crib) / 26
+                              + ((n1 - r1 + 26) % 26 < strlen (crib)));
 
-              {
+                  for (int n2 = 0; (n2 - r2 + 26) % 26 < notch1Hits;
+                       ++n2) // notch 2 position
+                    {
 
-                int out = shortEnigma (crib, cypher, *cfg);
+                      int out = shortEnigma (crib, cypher, *cfg);
 
-                if (out == 1)
-                  {
-                    return 1;
-                  }
-              }
+                      if (out == 1)
+                        {
+                          return 1;
+                        }
+                    }
+                }
             }
         }
     }
