@@ -21,11 +21,8 @@ struct config {
   int notch1;
   int notch2;
 
-  //flags
+//  int verbose;
 
-  char verbose;
-
-  // I want to remove the flags from this config struct for use in the Bombe
 };
 
 char alphabetIndex(char target) {

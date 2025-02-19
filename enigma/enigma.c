@@ -173,9 +173,9 @@ char parseArgs(int argc, char *argv[], struct config *cfg, char *string)
 
         i++;
         break;
-      case 'v':
-        cfg->verbose = 1;
-        break;
+//      case 'v':
+//       cfg->verbose = 1;
+//       break;
       case 'f':
         fprintf(stderr, "File input is not yet supported\n");
         return 10;
@@ -209,7 +209,7 @@ char parseArgs(int argc, char *argv[], struct config *cfg, char *string)
             "			  default is '-n1 5 -n2 10'\n"
             "  --config=file		select a file to load configurations "
             "from\n"
-	    "  -v			verbose output\n"
+//	    "  -v			verbose output\n"
             "  -o 			select a file to use as output\n"
             "  -f 			select a file to load as input\n"
             "  -h			show this help message\n");
@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
 
 
   // flags
-  cfg.verbose = 0;
+//  cfg.verbose = 0;
 
   char retVal = parseArgs(argc, argv, &cfg, string);
 
@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
     rotate(cfg.r3, cfg.r3pos, 26);
   }
 
-  if (cfg.verbose != 0) {
+/*  if (cfg.verbose != 0) {
     printf("String: %s\n", string);
     printf("r1 - %d: ", cfg.r1pos);
     printCypher(cfg.r1);
@@ -299,10 +299,10 @@ int main(int argc, char *argv[]) {
     printf("PB: ");
     printCypher(cfg.plugboard);
     printf("n1: %d, n2: %d\n", cfg.notch1, cfg.notch2);
-  }
+  } */
 
   char *output;
-  output = Enigma(string, cfg);
+  output = Enigma(string, &cfg);
 
   printf("%s\n", output);
 
