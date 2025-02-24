@@ -81,16 +81,14 @@ printCypher (const char *c)
 }
 
 char
-parseArgs (int argc, char *argv[], struct config *cfg, char *string,
+parseArgs (int argc, char *argv[], struct config *cfg, char **string,
            struct Rotors *rotors)
 {
-  printf("THIS THIS THIS");
-
   int *ptr; // temp variable used for switch cases
 
   for (int i = 1; i < argc; ++i)
     {
-      printf("ARGUMENT: %s", argv[i]);
+//    printf("ARGUMENT: %s", argv[i]);
 
       if (argv[i][0] == '-')
         {
@@ -273,11 +271,8 @@ parseArgs (int argc, char *argv[], struct config *cfg, char *string,
       else // the only other case is that it is the input string
         {
           // this isn't safe but I will fix later
-
-          printf ("WORD: %s", argv[i]);
-
-          string = (char *)malloc (strlen (argv[i]) * sizeof (char));
-          strcpy (string, argv[i]);
+          *string = (char *)malloc (strlen (argv[i]) * sizeof (char));
+          strcpy (*string, argv[i]);
         }
     }
 
@@ -287,9 +282,6 @@ parseArgs (int argc, char *argv[], struct config *cfg, char *string,
 int
 main (int argc, char *argv[])
 {
-
-
-  printf("FUCK THIS THIS");
 
   if (argc < 2)
     {
@@ -359,11 +351,7 @@ main (int argc, char *argv[])
   // flags
   //  cfg.verbose = 0;
 
-  printf("IS IT CALLED?");
-
-  char retVal = parseArgs (argc, argv, &cfg, string, &rotors);
-
-  printf("KHJASD");
+  char retVal = parseArgs (argc, argv, &cfg, &string, &rotors);
 
   if (retVal != 0)
     {
