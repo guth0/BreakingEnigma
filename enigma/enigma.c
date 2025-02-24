@@ -290,11 +290,11 @@ main (int argc, char *argv[])
     }
 
   // Initalize Rotors
-  char ROTOR_1[52] = "EKMFGHDQVZXRUTIABJSYCLWPONEKMFGHDQVZXRUTIABJSYCLWPO";
-  char ROTOR_2[52] = "AJDKSIRUBLHXQTMOWZYVFCPNGEAJDKSIRUBLHXQTMOWZYVFCPNG";
-  char ROTOR_3[52] = "BDFHJLNPRTVKXZMOQSUWYACEGIBDFHJLNPRTVKXZMOQSUWYACEG";
-  char ROTOR_4[52] = "KCPXSYOMZRTLEVFWUNAIQGHBDJKCPXSYOMZRTLEVFWUNAIQGHBD";
-  char ROTOR_5[52] = "LZIJTBYNREOAPUVDWHXCKQMGFSLZIJTBYNREOAPUVDWHXCKQMGF";
+  char ROTOR_1[27] = "EKMFGHDQVZXRUTIABJSYCLWPON";
+  char ROTOR_2[27] = "AJDKSIRUBLHXQTMOWZYVFCPNGE";
+  char ROTOR_3[27] = "BDFHJLNPRTVKXZMOQSUWYACEGI";
+  char ROTOR_4[27] = "KCPXSYOMZRTLEVFWUNAIQGHBDJ";
+  char ROTOR_5[27] = "LZIJTBYNREOAPUVDWHXCKQMGFS";
 
   char REFLECTOR_1[27] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
   char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
@@ -358,18 +358,21 @@ main (int argc, char *argv[])
       return retVal;
     }
 
+
+  /*
   if (cfg.r1pos != 0)
     {
-      fastRotate (cfg.r1, cfg.r1pos, 26);
+      fastRotate (&cfg.r1, cfg.r1pos, 26);
     }
   if (cfg.r2pos != 0)
     {
-      fastRotate (cfg.r2, cfg.r2pos, 26);
+      fastRotate (&cfg.r2, cfg.r2pos, 26);
     }
   if (cfg.r3pos != 0)
     {
-      fastRotate (cfg.r3, cfg.r3pos, 26);
+      fastRotate (&cfg.r3, cfg.r3pos, 26);
     }
+  */
 
   /*  if (cfg.verbose != 0) {
       printf("String: %s\n", string);
@@ -395,4 +398,4 @@ main (int argc, char *argv[])
   free (output);
 
   return 0;
-}
+} 
