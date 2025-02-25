@@ -135,20 +135,15 @@ char *Enigma(char *string, struct config *cfg) {
 
     index = cfg->plugboard[index];
 
-    // these might be wrong as well but I don't think so
     index = cfg->r1[(index - cfg->r1pos + 26) % 26];
     index = cfg->r2[(index - cfg->r2pos + 26) % 26];
     index = cfg->r3[(index - cfg->r3pos + 26) % 26];
-    // :)
 
     index = cfg->rfl[index];
 
-
-    // NEED TO FIX THESE
-    index = rotorIndex(cfg->r3, (index + cfg->r3pos) % 26);
-    index = rotorIndex(cfg->r2, (index + cfg->r2pos) % 26);
-    index = rotorIndex(cfg->r1, (index + cfg->r1pos) % 26);
-    // :(
+    index = (rotorIndex(cfg->r3, index) + cfg->r3pos) %26;
+    index = (rotorIndex(cfg->r2, index) + cfg->r2pos) %26;
+    index = (rotorIndex(cfg->r1, index) + cfg->r1pos) %26;
 
     index = cfg->plugboard[index];
 

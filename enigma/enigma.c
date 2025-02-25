@@ -88,7 +88,7 @@ parseArgs (int argc, char *argv[], struct config *cfg, char **string,
 
   for (int i = 1; i < argc; ++i)
     {
-//    printf("ARGUMENT: %s", argv[i]);
+      //    printf("ARGUMENT: %s", argv[i]);
 
       if (argv[i][0] == '-')
         {
@@ -306,10 +306,6 @@ main (int argc, char *argv[])
       REFLECTOR_1[i] -= 'A';
       REFLECTOR_2[i] -= 'A';
       ALPHABET[i] -= 'A';
-    }
-
-  for (int i = 0; i < 51; ++i)
-    {
       ROTOR_1[i] -= 'A';
       ROTOR_2[i] -= 'A';
       ROTOR_3[i] -= 'A';
@@ -358,7 +354,6 @@ main (int argc, char *argv[])
       return retVal;
     }
 
-
   /*
   if (cfg.r1pos != 0)
     {
@@ -398,4 +393,4 @@ main (int argc, char *argv[])
   free (output);
 
   return 0;
-} 
+}
