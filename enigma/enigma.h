@@ -7,14 +7,12 @@
 #include "rotors.h"
 
 struct config {
+  char r1[27];
+  char r2[27];
+  char r3[27];
+  char rfl[27];
 
-  // The arrays themselves are const but not the pointers
-  const char *r1; // [26]
-  const char *r2;
-  const char *r3;
-  const char *rfl; // [27]
-
-  char *plugboard;
+  char plugboard[27];
 
   int r1pos;
   int r2pos;
@@ -23,7 +21,8 @@ struct config {
   int notch1;
   int notch2;
 
-  //  int verbose;
+//  int verbose;
+
 };
 
 char alphabetIndex(char target) {
@@ -45,10 +44,9 @@ char rotorIndex(const char *rotor, char target) {
 
   return -1;
 }
-/*
-void spinRotors(char r1[27], char r2[27], char r3[27], int *r1count,
-                int *r2count, int *r3count, const int notch1,
-                const int notch2) {
+
+void spinRotors(char r1[27], char r2[27], char r3[27], int *r1count, int *r2count,
+                int *r3count, const int notch1, const int notch2) {
 
   if (notch1 == *r1count) {
     *r2count = (*r2count + 1) % 26;
@@ -63,7 +61,7 @@ void spinRotors(char r1[27], char r2[27], char r3[27], int *r1count,
   rotate(r1, 1, 26);
 }
 
-// this is so fucking unreadable, I'm gonna continue with the one above
+/* // this is so fucking unreadable, I'm gonna continue with the one above
 void spinRotors(struct config *cfg) {
 
   if (cfg->notch1 == cfg->r1pos) {
@@ -78,45 +76,7 @@ void spinRotors(struct config *cfg) {
   cfg->r1pos = (cfg->r1pos + 1) % 26;
   rotate(cfg->r1, 1, 26);
 }
-//
-
-void fastRotate(const char **cypher, const int pos, const int count) {
-
-  // calculate new offset
-  int newPos = (pos + count) % 26;
-
-  // apply new offset
-  *cypher += newPos - pos;
-}
-
-void fastSpinRotors(const char *r1, const char *r2, const char *r3, int
-*r1count, int *r2count, int *r3count, const int notch1, const int notch2) {
-
-  if (notch1 == *r1count) {
-    fastRotate(&r2, *r2count, 1);
-    *r2count = (*r2count + 1) % 26;
-    if (notch2 == *r2count) {
-      fastRotate(&r3, *r3count, 1);
-      *r3count = (*r3count + 1) % 26;
-    }
-  }
-
-  fastRotate(&r1, *r1count, 1);
-  *r1count = (*r1count + 1) % 26;
-}
-
 */
-void fasterSpinRotors(int *r1count, int *r2count, int *r3count,
-                      const int notch1, const int notch2) {
-
-  if (notch1 == *r1count) {
-    *r2count = (*r2count + 1) % 26;
-    if (notch2 == *r2count) {
-      *r3count = (*r3count + 1) % 26;
-    }
-  }
-  *r1count = (*r1count + 1) % 26;
-}
 
 char *Enigma(char *string, struct config *cfg) {
 
@@ -135,33 +95,23 @@ char *Enigma(char *string, struct config *cfg) {
 
     index = cfg->plugboard[index];
 
-    // these might be wrong as well but I don't think so
-    index = cfg->r1[(index - cfg->r1pos + 26) % 26];
-    index = cfg->r2[(index - cfg->r2pos + 26) % 26];
-    index = cfg->r3[(index - cfg->r3pos + 26) % 26];
-    // :)
+    index = cfg->r1[index];
+    index = cfg->r2[index];
+    index = cfg->r3[index];
 
     index = cfg->rfl[index];
 
-
-    // NEED TO FIX THESE
-    index = rotorIndex(cfg->r3, (index + cfg->r3pos) % 26);
-    index = rotorIndex(cfg->r2, (index + cfg->r2pos) % 26);
-    index = rotorIndex(cfg->r1, (index + cfg->r1pos) % 26);
-    // :(
+    index = rotorIndex(cfg->r3, index);
+    index = rotorIndex(cfg->r2, index);
+    index = rotorIndex(cfg->r1, index);
 
     index = cfg->plugboard[index];
 
     output[i] = index + 'A';
 
+
     // either this call is unreadable or the function itself is unreadable :(
-
-    fasterSpinRotors(&cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1,
-                     cfg->notch2);
-
-    //    spinRotors(cfg->r1, cfg->r2, cfg->r3, &cfg->r1pos, &cfg->r2pos,
-    //    &cfg->r3pos,
-    //               cfg->notch1, cfg->notch2);
+    spinRotors(cfg->r1, cfg->r2, cfg->r3, &cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1, cfg->notch2);
   }
 
   output[strlen(string)] = '\0';
