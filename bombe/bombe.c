@@ -1,5 +1,4 @@
 #include "../enigma/enigma.h"
-#include "../enigma/rotors.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -12,44 +11,20 @@
 // 	3. Impliment plugboard
 // 	3. Multiple Cribs (Idk if this is usefull or not)
 
-int
-main (int argc, char *argv[])
+struct Rotors
 {
+  char *r1;
+  char *r2;
+  char *r3;
+  char *r4;
+  char *r5;
 
-  // For development only:
+  char *rfl1;
+  char *rfl2;
+};
 
-  if (argc != 3)
-    {
-      fprintf (stderr, "Invalid Argument count '%d'", argc);
-      return 1;
-    }
-
-  char *crib = (char *)malloc (sizeof (char) * strlen (argv[1]));
-  char *cypher = (char *)malloc (sizeof (char) * strlen (argv[1]));
-
-  // since I am only checking if the crib is at the very start of the cypher,
-  // I only need the first X character of the cypher to compare with the crib
-  strcpy (crib, argv[1]);
-  strncpy (cypher, argv[2], strlen (argv[1]));
-  //
-
-  printf ("Cypher: '%s'\nCrib: '%s'\n", cypher, crib);
-
-  // to increase efficiency, I can't just use the Enigma function I already
-  // wrote, I have to harvest the code and wrap it in a for loop
-
-  return 0;
-}
-
-// IDEA:
-// 	- use testRotors() to find the "next" config that works with the
-// 	first letter of the crib and cyphertext
-// 	- pass testRotors a starter config to start with so that it can
-// 	remmeber where it left off.
-// 	- this could just spin the rotors and not change them around, I could
-// 	just call this once for every configuration of rotor positions
 int
-shortEnigma (char *crib, char *cypher, struct config cfg)
+shortEnigma (char *crib, char *cypher, struct config *cfg)
 {
 
   // char *output = (char *)malloc(strlen(string) + 1);
@@ -72,28 +47,27 @@ shortEnigma (char *crib, char *cypher, struct config cfg)
           continue;
         }
 
-      //    index = cfg.plugboard[index];
+      // index = cfg->plugboard[index];
 
-      index = cfg.r1[index];
-      index = cfg.r2[index];
-      index = cfg.r3[index];
+      index = cfg->r1[(index - cfg->r1pos + 26) % 26];
+      index = cfg->r2[(index - cfg->r2pos + 26) % 26];
+      index = cfg->r3[(index - cfg->r3pos + 26) % 26];
 
-      index = cfg.rfl[index];
+      index = cfg->rfl[index];
 
-      index = rotorIndex (cfg.r3, index);
-      index = rotorIndex (cfg.r2, index);
-      index = rotorIndex (cfg.r1, index);
+      index = (rotorIndex (cfg->r3, index) + cfg->r3pos) % 26;
+      index = (rotorIndex (cfg->r2, index) + cfg->r2pos) % 26;
+      index = (rotorIndex (cfg->r1, index) + cfg->r1pos) % 26;
 
-      //    index = cfg.plugboard[index];
+      // index = cfg->plugboard[index];
 
       if (cypher[i] != index + 'a')
         {
           return 0;
         }
 
-      // either this call is unreadable or the function itself is unreadable :(
-      spinRotors (cfg.r1, cfg.r2, cfg.r3, &cfg.r1pos, &cfg.r2pos, &cfg.r3pos,
-                  cfg.notch1, cfg.notch2);
+      spinRotors (&cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1,
+                  cfg->notch2);
     }
 
   return 1;
@@ -105,9 +79,7 @@ shortEnigma (char *crib, char *cypher, struct config cfg)
 // 	no plugboard (for now)
 // 	stops at the first incorrect letter
 // 	returns 1 if encyrpted crib = cypher, 0 if not
-// 	can't have cfg passed by pointer
 //
-// This MUST recieve a cfg that has all rotors at position 0!
 int
 testRotors (char *crib, char *cypher, struct config *cfg)
 {
@@ -130,13 +102,13 @@ testRotors (char *crib, char *cypher, struct config *cfg)
 
   for (int r1 = 0; r1 < 26; ++r1) // rotor 1 position
     {
-      rotate (cfg->r1, 1, 26);
+      cfg->r1pos = r1;
       for (int r2 = 0; r2 < 26; ++r2) // rotor 2 position
         {
-          rotate (cfg->r2, 1, 26);
+          cfg->r2pos = r2;
           for (int r3 = 0; r3 < 26; ++r3) // rotor 3 position
             {
-              rotate (cfg->r3, 1, 26);
+              cfg->r3pos = r3;
 
               // NOTCHES
               for (int n1 = 0; (n1 - r1 + 26) % 26 <= strlen (crib);
@@ -145,12 +117,17 @@ testRotors (char *crib, char *cypher, struct config *cfg)
                   int notch1Hits
                       = (int)(strlen (crib) / 26
                               + ((n1 - r1 + 26) % 26 < strlen (crib)));
+                  cfg->notch1 = n1;
 
-                  for (int n2 = 0; (n2 - r2 + 26) % 26 < notch1Hits;
+                  for (int n2 = 0; (n2 - r2 + 26) % 26 <= notch1Hits;
                        ++n2) // notch 2 position
                     {
+                      cfg->notch2 = n2;
 
-                      int out = shortEnigma (crib, cypher, *cfg);
+                      // Need to handle the case where the cfg that works is
+                      // one where the notch doesn't matter
+
+                      int out = shortEnigma (crib, cypher, cfg);
 
                       if (out == 1)
                         {
@@ -165,5 +142,65 @@ testRotors (char *crib, char *cypher, struct config *cfg)
   // Notch Loop
 
   // No matching config found
+  return 0;
+}
+
+int
+main (int argc, char *argv[])
+{
+
+  // For development only:
+
+  if (argc != 3)
+    {
+      fprintf (stderr, "Invalid Argument count '%d'", argc);
+      return 1;
+    }
+
+  // Initalize Rotors
+  char ROTOR_1[27] = "EKMFGHDQVZXRUTIABJSYCLWPON";
+  char ROTOR_2[27] = "AJDKSIRUBLHXQTMOWZYVFCPNGE";
+  char ROTOR_3[27] = "BDFHJLNPRTVKXZMOQSUWYACEGI";
+  char ROTOR_4[27] = "KCPXSYOMZRTLEVFWUNAIQGHBDJ";
+  char ROTOR_5[27] = "LZIJTBYNREOAPUVDWHXCKQMGFS";
+
+  char REFLECTOR_1[27] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
+  char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
+
+  char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  for (int i = 0; i < 26; ++i)
+    {
+      REFLECTOR_1[i] -= 'A';
+      REFLECTOR_2[i] -= 'A';
+      ALPHABET[i] -= 'A';
+      ROTOR_1[i] -= 'A';
+      ROTOR_2[i] -= 'A';
+      ROTOR_3[i] -= 'A';
+      ROTOR_4[i] -= 'A';
+      ROTOR_5[i] -= 'A';
+    }
+
+  struct Rotors rotors;
+
+  rotors.r1 = ROTOR_1;
+  rotors.r2 = ROTOR_2;
+  rotors.r3 = ROTOR_3;
+  rotors.r4 = ROTOR_4;
+  rotors.r5 = ROTOR_5;
+
+  rotors.rfl1 = REFLECTOR_1;
+  rotors.rfl2 = REFLECTOR_2;
+
+  char *crib = (char *)malloc (sizeof (char) * strlen (argv[1]));
+  char *cypher = (char *)malloc (sizeof (char) * strlen (argv[1]));
+
+  // since I am only checking if the crib is at the very start of the cypher,
+  // I only need the first X character of the cypher to compare with the crib
+  strcpy (crib, argv[1]);
+  strncpy (cypher, argv[2], strlen (argv[1]));
+
+  printf ("Cypher: '%s'\nCrib: '%s'\n", cypher, crib);
+
   return 0;
 }
