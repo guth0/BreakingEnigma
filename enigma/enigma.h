@@ -1,47 +1,12 @@
 #ifndef ENIGMA_H
 #define ENIGMA_H
 
+#include "../util/config.h"
+#include "../util/rotors.h"
+
 #include "stdlib.h"
 #include "string.h"
 
-struct config {
-
-  // The arrays themselves are const but not the pointers
-  const char *r1; // [27]
-  const char *r2;
-  const char *r3;
-  const char *rfl;
-
-  char *plugboard;
-
-  int r1pos;
-  int r2pos;
-  int r3pos;
-
-  int notch1;
-  int notch2;
-
-};
-
-char alphabetIndex(char target) {
-  if (target >= 'A' && target <= 'Z') {
-    return target - 'A';
-  } else if (target >= 'a' && target <= 'z') {
-    return target - 'a';
-  } else {
-    return -1;
-  }
-}
-
-char rotorIndex(const char *rotor, char target) {
-  for (int i = 0; i < 26; ++i) {
-    if (target == rotor[i]) {
-      return i;
-    }
-  }
-
-  return -1;
-}
 
 void spinRotors(int *r1count, int *r2count, int *r3count, const int notch1,
                 const int notch2) {
@@ -55,7 +20,7 @@ void spinRotors(int *r1count, int *r2count, int *r3count, const int notch1,
   *r1count = (*r1count + 1) % 26;
 }
 
-char *Enigma(char *string, struct config *cfg) {
+char *Enigma(char *string, struct Config *cfg) {
 
   char *output = (char *)malloc(strlen(string) + 1);
 

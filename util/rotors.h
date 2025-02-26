@@ -26,6 +26,26 @@ void rotate(char *arr, int d, int n)
   // rotated!! :)
 }
 
+char alphabetIndex(char target) {
+  if (target >= 'A' && target <= 'Z') {
+    return target - 'A';
+  } else if (target >= 'a' && target <= 'z') {
+    return target - 'a';
+  } else {
+    return -1;
+  }
+}
+
+char rotorIndex(const char *rotor, char target) {
+  for (int i = 0; i < 26; ++i) {
+    if (target == rotor[i]) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
 void printRotor(char *arr)
 {
   for (int i = 0; i < 26; ++i)

@@ -1,18 +1,8 @@
 #include <stdio.h>
 
 #include "enigma.h"
+#include "../util/config.h"
 
-struct Rotors
-{
-  char *r1;
-  char *r2;
-  char *r3;
-  char *r4;
-  char *r5;
-
-  char *rfl1;
-  char *rfl2;
-};
 
 void
 assignRotor (const char *r, int rNum, const struct Rotors *rotors)
@@ -81,7 +71,7 @@ printCypher (const char *c)
 }
 
 char
-parseArgs (int argc, char *argv[], struct config *cfg, char **string,
+parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
            struct Rotors *rotors)
 {
   int *ptr; // temp variable used for switch cases
@@ -229,7 +219,7 @@ parseArgs (int argc, char *argv[], struct config *cfg, char **string,
               printf (
                   "usage: enigma [-r [1-5](3)] [-p1/2/3 [0-25]] [-e [1-2]] "
                   "[-b=cypher] [-n1/2\n"
-                  "[0-25]] [--config=file] [-o file] [-f file] [text]\n"
+                  "[0-25]] [--Config=file] [-o file] [-f file] [text]\n"
                   "\n"
                   "enigma is a recreation of the encryption tool used during "
                   "WWII\n"
@@ -251,8 +241,8 @@ parseArgs (int argc, char *argv[], struct config *cfg, char **string,
                   "which\n"
                   "		        can be in 1 of 26 positions\n"
                   "			  default is '-n1 5 -n2 10'\n"
-                  "  --config=file		select a file to load "
-                  "configurations "
+                  "  --Config=file		select a file to load "
+                  "Configurations "
                   "from\n"
                   //	    "  -v			verbose output\n"
                   "  -o 			select a file to use as "
@@ -328,7 +318,7 @@ main (int argc, char *argv[])
 
   char *string;
 
-  struct config cfg;
+  struct Config cfg;
 
   // copy in default cyphers
   cfg.r1 = ROTOR_1;
