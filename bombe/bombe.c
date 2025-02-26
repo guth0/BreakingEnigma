@@ -27,8 +27,6 @@ int
 shortEnigma (char *crib, char *cypher, struct Config *cfg)
 {
 
-  // char *output = (char *)malloc(strlen(string) + 1);
-
   for (int i = 0; i < strlen (crib); i++)
     {
 
@@ -131,6 +129,13 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 
                       if (out == 1)
                         {
+
+                          cfg->r1pos = r1;
+                          cfg->r2pos = r2;
+                          cfg->r3pos = r3;
+
+                          cfg->notch1 = n1;
+                          cfg->notch2 = n2;
                           return 1;
                         }
                     }
@@ -200,7 +205,14 @@ main (int argc, char *argv[])
 
   int ret = testRotors (crib, cypher, &cfg);
 
-  printConfig (&cfg, &rotors);
+  if (ret == 1)
+    {
+      printConfig (&cfg, &rotors);
+    }
+  else
+    {
+      printf ("Its fucked\n");
+    }
 
   return 0;
 }
