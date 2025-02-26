@@ -1,4 +1,5 @@
 #include "../enigma/enigma.h"
+#include "../util/config.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -11,20 +12,19 @@
 // 	3. Impliment plugboard
 // 	3. Multiple Cribs (Idk if this is usefull or not)
 
-struct Rotors
-{
-  char *r1;
-  char *r2;
-  char *r3;
-  char *r4;
-  char *r5;
+char ROTOR_1[27] = "EKMFGHDQVZXRUTIABJSYCLWPON";
+char ROTOR_2[27] = "AJDKSIRUBLHXQTMOWZYVFCPNGE";
+char ROTOR_3[27] = "BDFHJLNPRTVKXZMOQSUWYACEGI";
+char ROTOR_4[27] = "KCPXSYOMZRTLEVFWUNAIQGHBDJ";
+char ROTOR_5[27] = "LZIJTBYNREOAPUVDWHXCKQMGFS";
 
-  char *rfl1;
-  char *rfl2;
-};
+char REFLECTOR_1[27] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
+char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
+
+char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 int
-shortEnigma (char *crib, char *cypher, struct config *cfg)
+shortEnigma (char *crib, char *cypher, struct Config *cfg)
 {
 
   // char *output = (char *)malloc(strlen(string) + 1);
@@ -61,7 +61,7 @@ shortEnigma (char *crib, char *cypher, struct config *cfg)
 
       // index = cfg->plugboard[index];
 
-      if (cypher[i] != index + 'a')
+      if (cypher[i] != index + 'A')
         {
           return 0;
         }
@@ -73,7 +73,7 @@ shortEnigma (char *crib, char *cypher, struct config *cfg)
   return 1;
 }
 
-// since the config is passed by pointer, the function can just return 1 if a
+// since the Config is passed by pointer, the function can just return 1 if a
 // correct position is found and 0 if not
 // optimized enigma function
 // 	no plugboard (for now)
@@ -81,7 +81,7 @@ shortEnigma (char *crib, char *cypher, struct config *cfg)
 // 	returns 1 if encyrpted crib = cypher, 0 if not
 //
 int
-testRotors (char *crib, char *cypher, struct config *cfg)
+testRotors (char *crib, char *cypher, struct Config *cfg)
 {
 
   // go over every rotation and notch combo in a loop here
@@ -139,9 +139,7 @@ testRotors (char *crib, char *cypher, struct config *cfg)
         }
     }
 
-  // Notch Loop
-
-  // No matching config found
+  // No matching Config found
   return 0;
 }
 
@@ -158,16 +156,6 @@ main (int argc, char *argv[])
     }
 
   // Initalize Rotors
-  char ROTOR_1[27] = "EKMFGHDQVZXRUTIABJSYCLWPON";
-  char ROTOR_2[27] = "AJDKSIRUBLHXQTMOWZYVFCPNGE";
-  char ROTOR_3[27] = "BDFHJLNPRTVKXZMOQSUWYACEGI";
-  char ROTOR_4[27] = "KCPXSYOMZRTLEVFWUNAIQGHBDJ";
-  char ROTOR_5[27] = "LZIJTBYNREOAPUVDWHXCKQMGFS";
-
-  char REFLECTOR_1[27] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
-  char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
-
-  char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   for (int i = 0; i < 26; ++i)
     {
@@ -181,7 +169,7 @@ main (int argc, char *argv[])
       ROTOR_5[i] -= 'A';
     }
 
-  struct Rotors rotors;
+  static struct Rotors rotors;
 
   rotors.r1 = ROTOR_1;
   rotors.r2 = ROTOR_2;
@@ -196,11 +184,23 @@ main (int argc, char *argv[])
   char *cypher = (char *)malloc (sizeof (char) * strlen (argv[1]));
 
   // since I am only checking if the crib is at the very start of the cypher,
-  // I only need the first X character of the cypher to compare with the crib
+  // I only need the first X characters of the cypher to compare with the crib
   strcpy (crib, argv[1]);
   strncpy (cypher, argv[2], strlen (argv[1]));
 
   printf ("Cypher: '%s'\nCrib: '%s'\n", cypher, crib);
+
+  // 5 * 4 * 3 = 60 rotor Configurations
+
+  struct Config cfg;
+  cfg.r1 = ROTOR_1;
+  cfg.r2 = ROTOR_2;
+  cfg.r3 = ROTOR_3;
+  cfg.rfl = REFLECTOR_1;
+
+  int ret = testRotors (crib, cypher, &cfg);
+
+  printConfig (&cfg, &rotors);
 
   return 0;
 }
