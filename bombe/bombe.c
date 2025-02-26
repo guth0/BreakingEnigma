@@ -100,13 +100,10 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 
   for (int r1 = 0; r1 < 26; ++r1) // rotor 1 position
     {
-      cfg->r1pos = r1;
       for (int r2 = 0; r2 < 26; ++r2) // rotor 2 position
         {
-          cfg->r2pos = r2;
           for (int r3 = 0; r3 < 26; ++r3) // rotor 3 position
             {
-              cfg->r3pos = r3;
 
               // NOTCHES
               for (int n1 = 0; (n1 - r1 + 26) % 26 <= strlen (crib);
@@ -115,13 +112,16 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
                   int notch1Hits
                       = (int)(strlen (crib) / 26
                               + ((n1 - r1 + 26) % 26 < strlen (crib)));
-                  cfg->notch1 = n1;
 
                   for (int n2 = 0; (n2 - r2 + 26) % 26 <= notch1Hits;
                        ++n2) // notch 2 position
                     {
-                      cfg->notch2 = n2;
+                      cfg->r1pos = r1;
+                      cfg->r2pos = r2;
+                      cfg->r3pos = r3;
 
+                      cfg->notch2 = n2;
+                      cfg->notch1 = n1;
                       // Need to handle the case where the cfg that works is
                       // one where the notch doesn't matter
 
