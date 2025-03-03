@@ -65,7 +65,7 @@ void printConfig(const struct Config *cfg, const struct Rotors *rotors) {
   printf("Position 3: %s, p = %d, n = %d\n", getRotorName(cfg->r3, rotors),
          cfg->r3pos, cfg->notch2);
 
-  printf("Position 4: %s\n", getReflectorName(cfg->r3, rotors));
+  printf("Position 4: %s\n", getReflectorName(cfg->rfl, rotors));
 }
 
 #endif
