@@ -344,21 +344,6 @@ main (int argc, char *argv[])
       return retVal;
     }
 
-  /*
-  if (cfg.r1pos != 0)
-    {
-      fastRotate (&cfg.r1, cfg.r1pos, 26);
-    }
-  if (cfg.r2pos != 0)
-    {
-      fastRotate (&cfg.r2, cfg.r2pos, 26);
-    }
-  if (cfg.r3pos != 0)
-    {
-      fastRotate (&cfg.r3, cfg.r3pos, 26);
-    }
-  */
-
   /*  if (cfg.verbose != 0) {
       printf("String: %s\n", string);
       printf("r1 - %d: ", cfg.r1pos);

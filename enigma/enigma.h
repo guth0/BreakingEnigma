@@ -8,18 +8,6 @@
 #include "string.h"
 
 
-void spinRotors(int *r1count, int *r2count, int *r3count, const int notch1,
-                const int notch2) {
-
-  if (notch1 == *r1count) {
-    *r2count = (*r2count + 1) % 26;
-    if (notch2 == *r2count) {
-      *r3count = (*r3count + 1) % 26;
-    }
-  }
-  *r1count = (*r1count + 1) % 26;
-}
-
 char *Enigma(char *string, struct Config *cfg) {
 
   char *output = (char *)malloc(strlen(string) + 1);
@@ -34,6 +22,8 @@ char *Enigma(char *string, struct Config *cfg) {
       output[i] = letter;
       continue;
     }
+
+    printf("p1: %d, p2: %d, p3: %d\n", cfg->r1pos, cfg->r2pos, cfg->r3pos);
 
     index = cfg->plugboard[index];
 

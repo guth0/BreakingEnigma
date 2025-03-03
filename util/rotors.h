@@ -3,27 +3,16 @@
 
 #include "stdio.h"
 
-void reverse(char *arr, int start, int end)
-{
-  while (start < end)
-  {
-    int temp = arr[start];
-    arr[start] = arr[end];
-    arr[end] = temp;
+void spinRotors(int *r1count, int *r2count, int *r3count, const int notch1,
+                const int notch2) {
 
-    start++;
-    end--;
+  if (notch1 == *r1count) {
+    if (notch2 == *r2count) {
+      *r3count = (*r3count + 1) % 26;
+    }
+    *r2count = (*r2count + 1) % 26;
   }
-}
-
-void rotate(char *arr, int d, int n)
-{
-  d %= n;
-  reverse(arr, 0, d-1);
-  reverse(arr, d, n - 1 );
-  reverse(arr, 0, n-1);
-
-  // rotated!! :)
+  *r1count = (*r1count + 1) % 26;
 }
 
 char alphabetIndex(char target) {
@@ -46,15 +35,12 @@ char rotorIndex(const char *rotor, char target) {
   return -1;
 }
 
-void printRotor(char *arr)
-{
-  for (int i = 0; i < 26; ++i)
-  {
+void printRotor(char *arr) {
+  for (int i = 0; i < 26; ++i) {
     printf("%c", arr[i] + 'A');
   }
-  
+
   printf("\n");
 }
-
 
 #endif
