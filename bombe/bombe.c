@@ -1,5 +1,5 @@
-#include "../enigma/enigma.h"
 #include "../util/config.h"
+#include "../util/rotors.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -45,13 +45,15 @@ shortEnigma (char *crib, char *cypher, struct Config *cfg)
           continue;
         }
 
+      // Send through Enigma
+
       // index = cfg->plugboard[index];
 
       index = cfg->r1[(index - cfg->r1pos + 26) % 26];
       index = cfg->r2[(index - cfg->r2pos + 26) % 26];
       index = cfg->r3[(index - cfg->r3pos + 26) % 26];
 
-      index = cfg->rfl[index];
+      index = cfg->rfl[index]; // reflector
 
       index = (rotorIndex (cfg->r3, index) + cfg->r3pos) % 26;
       index = (rotorIndex (cfg->r2, index) + cfg->r2pos) % 26;
@@ -59,6 +61,7 @@ shortEnigma (char *crib, char *cypher, struct Config *cfg)
 
       // index = cfg->plugboard[index];
 
+      // check for match
       if (cypher[i] != index + 'A')
         {
           return 0;
@@ -106,16 +109,32 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
             {
 
               // NOTCHES
-              for (int n1 = 0; (n1 - r1 + 26) % 26 <= strlen (crib);
-                   ++n1) // notch 1 position
+              //              for (int n1 = 0; (n1 - r1 + 26) % 26 <= strlen
+              //              (crib);
+              //                   ++n1) // notch 1 position
+
+              for (int i1 = 0; i1 < strlen (crib) / 26 + 1; ++i1)
                 {
+
+                  int n1 = (r1 + n1) % 26;
+
                   int notch1Hits
                       = (int)(strlen (crib) / 26
                               + ((n1 - r1 + 26) % 26 < strlen (crib)));
 
-                  for (int n2 = 0; (n2 - r2 + 26) % 26 <= notch1Hits;
-                       ++n2) // notch 2 position
+                  //                  for (int n2 = 0; (n2 - r2 + 26) % 26 <=
+                  //                  notch1Hits;
+                  //                       ++n2) // notch 2 position
+                  for (int i2 = 0; i2 <= notch1Hits; ++i2)
                     {
+
+                      int n2 = (r2 + i2) % 26;
+
+                      //printf ("r1: %d, r2: %d, r3: %d, n1 : % d, n2 : % d\n ",
+                      //        r1, r2, r3, n1, n2);
+
+                      // apply settings (needs to be here b/c
+                      //  		 shortEnigma changes it)
                       cfg->r1pos = r1;
                       cfg->r2pos = r2;
                       cfg->r3pos = r3;
@@ -129,6 +148,8 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 
                       if (out == 1)
                         {
+
+                          // reset settings and return
 
                           cfg->r1pos = r1;
                           cfg->r2pos = r2;
@@ -149,6 +170,55 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 }
 
 int
+testPermutation (int rotorNum1, int rotorNum2, int rotorNum3, char *rotors[],
+                 struct Config *cfg, char *crib, char *cypher)
+{
+  // set rotors
+  cfg->r1 = rotors[rotorNum1];
+  cfg->r2 = rotors[rotorNum2];
+  cfg->r3 = rotors[rotorNum3];
+
+  return testRotors (crib, cypher, cfg);
+}
+
+int
+permuteRotors (char *crib, char *cypher, char *rotors[], struct Config *cfg)
+{
+
+  for (int i = 0; i < 5; ++i)
+    {
+      for (int j = 0; j < 5; ++j)
+        {
+          if (i == j)
+            {
+              continue;
+            }
+
+          for (int k = 0; k < 5; ++k)
+            {
+              if (k == i || k == j)
+                {
+                  continue;
+                }
+
+              printf ("%d, %d, %d\n", i + 1, j + 1, k + 1);
+
+              int ret = testPermutation (i, j, k, rotors, cfg, crib, cypher);
+
+	      // for testing
+              return 1;
+
+              if (ret == 1)
+                {
+                  return 1;
+                }
+            }
+        }
+    }
+  return 0;
+}
+
+int
 main (int argc, char *argv[])
 {
 
@@ -159,6 +229,8 @@ main (int argc, char *argv[])
       fprintf (stderr, "Invalid Argument count '%d'", argc);
       return 1;
     }
+
+  // make sure that the crib is shorter than the cypher
 
   // Initalize Rotors
 
@@ -185,6 +257,8 @@ main (int argc, char *argv[])
   rotors.rfl1 = REFLECTOR_1;
   rotors.rfl2 = REFLECTOR_2;
 
+  char *rotorArr[5] = { ROTOR_1, ROTOR_2, ROTOR_3, ROTOR_4, ROTOR_5 };
+
   char *crib = (char *)malloc (sizeof (char) * strlen (argv[1]));
   char *cypher = (char *)malloc (sizeof (char) * strlen (argv[1]));
 
@@ -197,13 +271,22 @@ main (int argc, char *argv[])
 
   // 5 * 4 * 3 = 60 rotor Configurations
 
+  // shuffle rotors and call testRotors on each
+
   struct Config cfg;
   cfg.r1 = ROTOR_1;
   cfg.r2 = ROTOR_2;
   cfg.r3 = ROTOR_3;
+
+  // call permute twice, once with each reflector
   cfg.rfl = REFLECTOR_1;
 
-  int ret = testRotors (crib, cypher, &cfg);
+
+  printf("%d\n", testRotors (crib, cypher, &cfg));
+
+  return testPermutation (1, 2, 3, rotorArr, &cfg, crib, cypher);
+
+  int ret = permuteRotors (crib, cypher, rotorArr, &cfg);
 
   if (ret == 1)
     {
@@ -211,8 +294,23 @@ main (int argc, char *argv[])
     }
   else
     {
-      printf ("Its fucked\n");
+      // if fail, call again with the other rotor
+      cfg.rfl = REFLECTOR_2;
+
+      ret = permuteRotors (crib, cypher, rotorArr, &cfg);
+
+      if (ret == 1)
+        {
+          printConfig (&cfg, &rotors);
+        }
+      else
+        {
+          printf ("No working config found\n");
+        }
     }
+
+  free (crib);
+  free (cypher);
 
   return 0;
 }

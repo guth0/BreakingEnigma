@@ -35,7 +35,7 @@ char rotorIndex(const char *rotor, char target) {
   return -1;
 }
 
-void printRotor(char *arr) {
+void printRotor(const char *arr) {
   for (int i = 0; i < 26; ++i) {
     printf("%c", arr[i] + 'A');
   }
