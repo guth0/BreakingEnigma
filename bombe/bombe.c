@@ -61,15 +61,20 @@ shortEnigma (char *crib, char *cypher, struct Config *cfg)
 
       // index = cfg->plugboard[index];
 
+      //      printf("%c", index + 'A');
+
       // check for match
       if (cypher[i] != index + 'A')
         {
+          //	  printf(" !! :(\n");
           return 0;
         }
 
       spinRotors (&cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1,
                   cfg->notch2);
     }
+
+  //  printf(" :)\n");
 
   return 1;
 }
@@ -101,6 +106,15 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 
   // Rotor Loop
 
+  // If strlen(crib) > 26, then we will have repeated notches.
+  int fixedCribLen = strlen(crib);
+
+  if (fixedCribLen > 26)
+  {
+    fixedCribLen = 26;
+  }
+
+
   for (int r1 = 0; r1 < 26; ++r1) // rotor 1 position
     {
       for (int r2 = 0; r2 < 26; ++r2) // rotor 2 position
@@ -113,10 +127,10 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
               //              (crib);
               //                   ++n1) // notch 1 position
 
-              for (int i1 = 0; i1 < strlen (crib) / 26 + 1; ++i1)
+              for (int i1 = 0; i1 < fixedCribLen; ++i1)
                 {
 
-                  int n1 = (r1 + n1) % 26;
+                  int n1 = (r1 + i1) % 26;
 
                   int notch1Hits
                       = (int)(strlen (crib) / 26
@@ -125,13 +139,18 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
                   //                  for (int n2 = 0; (n2 - r2 + 26) % 26 <=
                   //                  notch1Hits;
                   //                       ++n2) // notch 2 position
-                  for (int i2 = 0; i2 <= notch1Hits; ++i2)
+                  for (int i2 = 0; i2 <= notch1Hits + 3; ++i2)
                     {
 
                       int n2 = (r2 + i2) % 26;
-
-                      //printf ("r1: %d, r2: %d, r3: %d, n1 : % d, n2 : % d\n ",
-                      //        r1, r2, r3, n1, n2);
+                      
+		      /*
+                      if (r1 == 0 && r2 == 0 && r3 == 0)
+                        {
+                          printf (
+                              "r1: %d, r2: %d, r3: %d, n1 : % d, n2 : % d\n ",
+                              r1, r2, r3, n1, n2);
+                        }*/
 
                       // apply settings (needs to be here b/c
                       //  		 shortEnigma changes it)
@@ -201,11 +220,11 @@ permuteRotors (char *crib, char *cypher, char *rotors[], struct Config *cfg)
                   continue;
                 }
 
-              printf ("%d, %d, %d\n", i + 1, j + 1, k + 1);
+              // printf ("%d, %d, %d\n", i + 1, j + 1, k + 1);
 
               int ret = testPermutation (i, j, k, rotors, cfg, crib, cypher);
 
-	      // for testing
+              // for testing
               return 1;
 
               if (ret == 1)
@@ -281,10 +300,22 @@ main (int argc, char *argv[])
   // call permute twice, once with each reflector
   cfg.rfl = REFLECTOR_1;
 
+  cfg.r1pos = 0;
+  cfg.r2pos = 0;
+  cfg.r3pos = 0;
 
-  printf("%d\n", testRotors (crib, cypher, &cfg));
+  cfg.notch1 = 5;
+  cfg.notch2 = 5;
 
-  return testPermutation (1, 2, 3, rotorArr, &cfg, crib, cypher);
+  /*
+  printf ("ShortEnigma: %d\n", shortEnigma (crib, cypher, &cfg));
+
+  printf ("TestRotors: %d\n", testRotors (crib, cypher, &cfg));
+
+  printf ("testPermutation: %d\n",
+          testPermutation (1, 2, 3, rotorArr, &cfg, crib, cypher));
+
+  return 0;*/
 
   int ret = permuteRotors (crib, cypher, rotorArr, &cfg);
 
