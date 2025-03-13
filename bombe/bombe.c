@@ -11,6 +11,8 @@
 //
 // 	3. Impliment plugboard
 // 	3. Multiple Cribs (Idk if this is usefull or not)
+//
+//
 
 char ROTOR_1[27] = "EKMFGHDQVZXRUTIABJSYCLWPON";
 char ROTOR_2[27] = "AJDKSIRUBLHXQTMOWZYVFCPNGE";
@@ -107,13 +109,12 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
   // Rotor Loop
 
   // If strlen(crib) > 26, then we will have repeated notches.
-  int fixedCribLen = strlen(crib);
+  int fixedCribLen = strlen (crib);
 
   if (fixedCribLen > 26)
-  {
-    fixedCribLen = 26;
-  }
-
+    {
+      fixedCribLen = 26;
+    }
 
   for (int r1 = 0; r1 < 26; ++r1) // rotor 1 position
     {
@@ -143,8 +144,8 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
                     {
 
                       int n2 = (r2 + i2) % 26;
-                      
-		      /*
+
+                      /*
                       if (r1 == 0 && r2 == 0 && r3 == 0)
                         {
                           printf (
@@ -307,21 +308,21 @@ main (int argc, char *argv[])
   cfg.notch1 = 5;
   cfg.notch2 = 5;
 
-  /*
   printf ("ShortEnigma: %d\n", shortEnigma (crib, cypher, &cfg));
 
   printf ("TestRotors: %d\n", testRotors (crib, cypher, &cfg));
 
   printf ("testPermutation: %d\n",
-          testPermutation (1, 2, 3, rotorArr, &cfg, crib, cypher));
+          testPermutation (0, 1, 2, rotorArr, &cfg, crib, cypher));
 
-  return 0;*/
+  // return 0;
 
   int ret = permuteRotors (crib, cypher, rotorArr, &cfg);
 
   if (ret == 1)
     {
       printConfig (&cfg, &rotors);
+      printf ("1st is right\n");
     }
   else
     {
@@ -333,6 +334,8 @@ main (int argc, char *argv[])
       if (ret == 1)
         {
           printConfig (&cfg, &rotors);
+
+          printf ("2st is right\n");
         }
       else
         {
