@@ -63,20 +63,16 @@ shortEnigma (char *crib, char *cypher, struct Config *cfg)
 
       // index = cfg->plugboard[index];
 
-      //      printf("%c", index + 'A');
 
       // check for match
       if (cypher[i] != index + 'A')
         {
-          //	  printf(" !! :(\n");
           return 0;
         }
 
       spinRotors (&cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1,
                   cfg->notch2);
     }
-
-  //  printf(" :)\n");
 
   return 1;
 }
@@ -123,11 +119,6 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
           for (int r3 = 0; r3 < 26; ++r3) // rotor 3 position
             {
 
-              // NOTCHES
-              //              for (int n1 = 0; (n1 - r1 + 26) % 26 <= strlen
-              //              (crib);
-              //                   ++n1) // notch 1 position
-
               for (int i1 = 0; i1 < fixedCribLen; ++i1)
                 {
 
@@ -137,21 +128,11 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
                       = (int)(strlen (crib) / 26
                               + ((n1 - r1 + 26) % 26 < strlen (crib)));
 
-                  //                  for (int n2 = 0; (n2 - r2 + 26) % 26 <=
-                  //                  notch1Hits;
-                  //                       ++n2) // notch 2 position
                   for (int i2 = 0; i2 <= notch1Hits + 3; ++i2)
                     {
 
                       int n2 = (r2 + i2) % 26;
 
-                      /*
-                      if (r1 == 0 && r2 == 0 && r3 == 0)
-                        {
-                          printf (
-                              "r1: %d, r2: %d, r3: %d, n1 : % d, n2 : % d\n ",
-                              r1, r2, r3, n1, n2);
-                        }*/
 
                       // apply settings (needs to be here b/c
                       //  		 shortEnigma changes it)
@@ -201,6 +182,7 @@ testPermutation (int rotorNum1, int rotorNum2, int rotorNum3, char *rotors[],
   return testRotors (crib, cypher, cfg);
 }
 
+// 5 * 4 * 3 = 60 rotor Configurations
 int
 permuteRotors (char *crib, char *cypher, char *rotors[], struct Config *cfg)
 {
@@ -221,12 +203,7 @@ permuteRotors (char *crib, char *cypher, char *rotors[], struct Config *cfg)
                   continue;
                 }
 
-              // printf ("%d, %d, %d\n", i + 1, j + 1, k + 1);
-
               int ret = testPermutation (i, j, k, rotors, cfg, crib, cypher);
-
-              // for testing
-              return 1;
 
               if (ret == 1)
                 {
@@ -289,40 +266,18 @@ main (int argc, char *argv[])
 
   printf ("Cypher: '%s'\nCrib: '%s'\n", cypher, crib);
 
-  // 5 * 4 * 3 = 60 rotor Configurations
-
   // shuffle rotors and call testRotors on each
 
   struct Config cfg;
-  cfg.r1 = ROTOR_1;
-  cfg.r2 = ROTOR_2;
-  cfg.r3 = ROTOR_3;
 
   // call permute twice, once with each reflector
   cfg.rfl = REFLECTOR_1;
-
-  cfg.r1pos = 0;
-  cfg.r2pos = 0;
-  cfg.r3pos = 0;
-
-  cfg.notch1 = 5;
-  cfg.notch2 = 5;
-
-  printf ("ShortEnigma: %d\n", shortEnigma (crib, cypher, &cfg));
-
-  printf ("TestRotors: %d\n", testRotors (crib, cypher, &cfg));
-
-  printf ("testPermutation: %d\n",
-          testPermutation (0, 1, 2, rotorArr, &cfg, crib, cypher));
-
-  // return 0;
 
   int ret = permuteRotors (crib, cypher, rotorArr, &cfg);
 
   if (ret == 1)
     {
       printConfig (&cfg, &rotors);
-      printf ("1st is right\n");
     }
   else
     {
@@ -334,8 +289,6 @@ main (int argc, char *argv[])
       if (ret == 1)
         {
           printConfig (&cfg, &rotors);
-
-          printf ("2st is right\n");
         }
       else
         {
