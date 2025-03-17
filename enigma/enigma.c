@@ -1,29 +1,28 @@
 #include <stdio.h>
 
-#include "enigma.h"
 #include "../util/config.h"
-
+#include "enigma.h"
 
 void
-assignRotor (const char *r, int rNum, const struct Rotors *rotors)
+assignRotor (const char **r, int rNum, const struct Rotors *rotors)
 {
 
   switch (rNum)
     {
     case 1:
-      r = rotors->r1;
+      *r = rotors->r1;
       break;
     case 2:
-      r = rotors->r2;
+      *r = rotors->r2;
       break;
     case 3:
-      r = rotors->r3;
+      *r = rotors->r3;
       break;
     case 4:
-      r = rotors->r4;
+      *r = rotors->r4;
       break;
     case 5:
-      r = rotors->r5;
+      *r = rotors->r5;
       break;
     }
 }
@@ -101,6 +100,8 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
               strncpy (cfg->plugboard, argv[i + 1], 26);
               cfg->plugboard[27] = '\0';
 
+
+	      // since two arguemnts are used, we increment i an extra time
               i++;
               break;
             case 'r':
@@ -114,10 +115,11 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                     }
                 }
 
-              assignRotor (cfg->r1, argv[i + 1][0] - '0', rotors);
-              assignRotor (cfg->r2, argv[i + 1][1] - '0', rotors);
-              assignRotor (cfg->r3, argv[i + 1][2] - '0', rotors);
+              assignRotor (&cfg->r1, argv[i + 1][0] - '0', rotors);
+              assignRotor (&cfg->r2, argv[i + 1][1] - '0', rotors);
+              assignRotor (&cfg->r3, argv[i + 1][2] - '0', rotors);
 
+	      // since two arguemnts are used, we increment i an extra time
               i++;
               break;
             case 'e':
@@ -136,6 +138,7 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                   return 4;
                 }
 
+	      // since two arguemnts are used, we increment i an extra time
               i++;
               break;
             case 'p':
@@ -200,6 +203,7 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                   return 6;
                 }
 
+	      // since two arguemnts are used, we increment i an extra time
               i++;
               break;
               //      case 'v':
