@@ -3,30 +3,6 @@
 #include "../util/config.h"
 #include "enigma.h"
 
-void
-assignRotor (const char **r, int rNum, const struct Rotors *rotors)
-{
-
-  switch (rNum)
-    {
-    case 1:
-      *r = rotors->r1;
-      break;
-    case 2:
-      *r = rotors->r2;
-      break;
-    case 3:
-      *r = rotors->r3;
-      break;
-    case 4:
-      *r = rotors->r4;
-      break;
-    case 5:
-      *r = rotors->r5;
-      break;
-    }
-}
-
 char
 isValidPlugboard (char *arr)
 {
@@ -115,9 +91,10 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                     }
                 }
 
-              assignRotor (&cfg->r1, argv[i + 1][0] - '0', rotors);
-              assignRotor (&cfg->r2, argv[i + 1][1] - '0', rotors);
-              assignRotor (&cfg->r3, argv[i + 1][2] - '0', rotors);
+	      // sets the rotors to the selected ones
+              cfg->r1 = rotors->r[argv[i + 1][0] - '0'];
+              cfg->r2 = rotors->r[argv[i + 1][1] - '0'];
+              cfg->r3 = rotors->r[argv[i + 1][2] - '0'];
 
 	      // since two arguemnts are used, we increment i an extra time
               i++;
@@ -127,10 +104,11 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
               switch (argv[i + 1][0])
                 {
                 case '1':
-                  cfg->rfl = rotors->rfl1;
-                  break;
                 case '2':
-                  cfg->rfl = rotors->rfl2;
+
+		  // changes the rotor to the selected one
+                  cfg->rfl = rotors->rfl['1' - argv[i+1][0]];
+
                   break;
                 default:
                   fprintf (stderr, "Invalid Reflector Number '%c'\n",
@@ -307,16 +285,16 @@ main (int argc, char *argv[])
       ROTOR_5[i] -= 'A';
     }
 
-  struct Rotors rotors;
+  static struct Rotors rotors;
 
-  rotors.r1 = ROTOR_1;
-  rotors.r2 = ROTOR_2;
-  rotors.r3 = ROTOR_3;
-  rotors.r4 = ROTOR_4;
-  rotors.r5 = ROTOR_5;
+  rotors.r[0] = ROTOR_1;
+  rotors.r[1] = ROTOR_2;
+  rotors.r[2] = ROTOR_3;
+  rotors.r[3] = ROTOR_4;
+  rotors.r[4] = ROTOR_5;
 
-  rotors.rfl1 = REFLECTOR_1;
-  rotors.rfl2 = REFLECTOR_2;
+  rotors.rfl[0] = REFLECTOR_1;
+  rotors.rfl[1] = REFLECTOR_2;
 
   // give these all default values but overwrite them with user input
 

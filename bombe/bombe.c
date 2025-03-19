@@ -63,7 +63,6 @@ shortEnigma (char *crib, char *cypher, struct Config *cfg)
 
       // index = cfg->plugboard[index];
 
-
       // check for match
       if (cypher[i] != index + 'A')
         {
@@ -133,7 +132,6 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 
                       int n2 = (r2 + i2) % 26;
 
-
                       // apply settings (needs to be here b/c
                       //  		 shortEnigma changes it)
                       cfg->r1pos = r1;
@@ -171,20 +169,22 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 }
 
 int
-testPermutation (int rotorNum1, int rotorNum2, int rotorNum3, char *rotors[],
-                 struct Config *cfg, char *crib, char *cypher)
+testPermutation (int rotorNum1, int rotorNum2, int rotorNum3,
+                 const struct Rotors *rotors, struct Config *cfg, char *crib,
+                 char *cypher)
 {
   // set rotors
-  cfg->r1 = rotors[rotorNum1];
-  cfg->r2 = rotors[rotorNum2];
-  cfg->r3 = rotors[rotorNum3];
+  cfg->r1 = rotors->r[rotorNum1];
+  cfg->r2 = rotors->r[rotorNum2];
+  cfg->r3 = rotors->r[rotorNum3];
 
   return testRotors (crib, cypher, cfg);
 }
 
 // 5 * 4 * 3 = 60 rotor Configurations
 int
-permuteRotors (char *crib, char *cypher, char *rotors[], struct Config *cfg)
+permuteRotors (char *crib, char *cypher, const struct Rotors *rotors,
+               struct Config *cfg)
 {
 
   for (int i = 0; i < 5; ++i)
@@ -245,16 +245,14 @@ main (int argc, char *argv[])
 
   static struct Rotors rotors;
 
-  rotors.r1 = ROTOR_1;
-  rotors.r2 = ROTOR_2;
-  rotors.r3 = ROTOR_3;
-  rotors.r4 = ROTOR_4;
-  rotors.r5 = ROTOR_5;
+  rotors.r[0] = ROTOR_1;
+  rotors.r[1] = ROTOR_2;
+  rotors.r[2] = ROTOR_3;
+  rotors.r[3] = ROTOR_4;
+  rotors.r[4] = ROTOR_5;
 
-  rotors.rfl1 = REFLECTOR_1;
-  rotors.rfl2 = REFLECTOR_2;
-
-  char *rotorArr[5] = { ROTOR_1, ROTOR_2, ROTOR_3, ROTOR_4, ROTOR_5 };
+  rotors.rfl[0] = REFLECTOR_1;
+  rotors.rfl[1] = REFLECTOR_2;
 
   char *crib = (char *)malloc (sizeof (char) * strlen (argv[1]));
   char *cypher = (char *)malloc (sizeof (char) * strlen (argv[1]));
@@ -273,7 +271,7 @@ main (int argc, char *argv[])
   // call permute twice, once with each reflector
   cfg.rfl = REFLECTOR_1;
 
-  int ret = permuteRotors (crib, cypher, rotorArr, &cfg);
+  int ret = permuteRotors (crib, cypher, &rotors, &cfg);
 
   if (ret == 1)
     {
@@ -284,7 +282,7 @@ main (int argc, char *argv[])
       // if fail, call again with the other rotor
       cfg.rfl = REFLECTOR_2;
 
-      ret = permuteRotors (crib, cypher, rotorArr, &cfg);
+      ret = permuteRotors (crib, cypher, &rotors, &cfg);
 
       if (ret == 1)
         {

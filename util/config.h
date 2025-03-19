@@ -21,41 +21,40 @@ struct Config {
 };
 
 struct Rotors {
-  char *r1;
-  char *r2;
-  char *r3;
-  char *r4;
-  char *r5;
+  char *r[5];
 
-  char *rfl1;
-  char *rfl2;
+  char *rfl[2];
 };
 
 char *getRotorName(const char *r, const struct Rotors *rotors) {
-  if (r == rotors->r1) {
-    return "Rotor 1";
-  } else if (r == rotors->r2) {
-    return "Rotor 2";
-  } else if (r == rotors->r3) {
-    return "Rotor 3";
-  } else if (r == rotors->r4) {
-    return "Rotor 4";
-  } else if (r == rotors->r5) {
-    return "Rotor 5";
+
+  // 8 here b/c "ROTOR X\0" 
+  char returnString[8];
+
+  for (int i = 0; i < 5; ++i){
+     if (r == rotors->r[i])
+     {
+       // 6 is always where the number goes
+       // add i to '1' to get the correct rotor number
+       returnString[6] = '1' + i;
+       
+     }
+
   }
 
-  return "ERROR";
+  return "NO MATCHING ROTOR";
 }
 
 char *getReflectorName(const char *r, const struct Rotors *rotors) {
 
-  if (r == rotors->rfl1) {
+  // just did an IF statement here b/c only two cases
+  if (r == rotors->rfl[1]) {
     return "Reflector 1";
-  } else if (r == rotors->rfl2) {
+  } else if (r == rotors->rfl[2]) {
     return "Reflector 2";
   }
 
-  return "ERROR";
+  return "NO MATCHING REFLECTOR";
 }
 
 void printConfig(const struct Config *cfg, const struct Rotors *rotors) {
