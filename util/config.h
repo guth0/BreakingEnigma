@@ -1,7 +1,13 @@
+// PROBLEMS:
+// 	1. When not using rotors 123, the rotor numbers are all +1
+// 		i.e. -r 213 -> 324
+// 	2. Reflector 2 does not work
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
 #include "stdio.h"
+#include "stdlib.h"
 
 struct Config {
   // The arrays themselves are const but not the pointers
@@ -26,45 +32,50 @@ struct Rotors {
   char *rfl[2];
 };
 
-char *getRotorName(const char *r, const struct Rotors *rotors) {
+int getRotorNum(const char *r, const struct Rotors *rotors) {
 
-  // 8 here b/c "ROTOR X\0" 
-  char returnString[8];
-
-  for (int i = 0; i < 5; ++i){
-     if (r == rotors->r[i])
-     {
-       // 6 is always where the number goes
-       // add i to '1' to get the correct rotor number
-       returnString[6] = '1' + i;
-       
-     }
-
+  for (int i = 0; i < 5; ++i) {
+    if (r == rotors->r[i]) {
+      // We don't have a 0 rotor
+      return i + 1;
+    }
   }
 
-  return "NO MATCHING ROTOR";
+  // -1 for unfound rotor
+  return -1;
 }
 
-char *getReflectorName(const char *r, const struct Rotors *rotors) {
+int getReflectorNum(const char *r, const struct Rotors *rotors) {
 
   // just did an IF statement here b/c only two cases
-  if (r == rotors->rfl[1]) {
-    return "Reflector 1";
-  } else if (r == rotors->rfl[2]) {
-    return "Reflector 2";
+  if (r == rotors->rfl[0]) {
+    return 1;
+  } else if (r == rotors->rfl[1]) {
+    return 2;
   }
 
-  return "NO MATCHING REFLECTOR";
+  // -1 for unfound reflector
+  return -1;
 }
 
 void printConfig(const struct Config *cfg, const struct Rotors *rotors) {
-  printf("Position 1: %s, p = %d\n", getRotorName(cfg->r1, rotors), cfg->r1pos);
-  printf("Position 2: %s, p = %d, n = %d\n", getRotorName(cfg->r2, rotors),
-         cfg->r2pos, cfg->notch1);
-  printf("Position 3: %s, p = %d, n = %d\n", getRotorName(cfg->r3, rotors),
-         cfg->r3pos, cfg->notch2);
 
-  printf("Position 4: %s\n", getReflectorName(cfg->rfl, rotors));
+  // declare num to hold our
+  int num;
+
+  num = getRotorNum(cfg->r1, rotors);
+  printf("Position 1: ROTOR #%d, p = %d\n", num, cfg->r1pos);
+
+  num = getRotorNum(cfg->r2, rotors);
+  printf("Position 2: ROTOR #%d, p = %d, n = %d\n", num, cfg->r2pos,
+         cfg->notch1);
+
+  num = getRotorNum(cfg->r3, rotors);
+  printf("Position 3: ROTOR #%d, p = %d, n = %d\n", num, cfg->r3pos,
+         cfg->notch2);
+
+  num = getReflectorNum(cfg->rfl, rotors);
+  printf("Position 4: REFLECTOR #%d\n", num);
 }
 
 #endif
