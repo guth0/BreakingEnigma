@@ -107,7 +107,7 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                 case '2':
 
 		  // changes the rotor to the selected one
-                  cfg->rfl = rotors->rfl['1' - argv[i+1][0]];
+                  cfg->rfl = rotors->rfl[argv[i+1][0] - '1'];
 
                   break;
                 default:

@@ -1,7 +1,6 @@
 // PROBLEMS:
 // 	1. When not using rotors 123, the rotor numbers are all +1
 // 		i.e. -r 213 -> 324
-// 	2. Reflector 2 does not work
 
 #ifndef CONFIG_H
 #define CONFIG_H
