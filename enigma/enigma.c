@@ -92,9 +92,9 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                 }
 
 	      // sets the rotors to the selected ones
-              cfg->r1 = rotors->r[argv[i + 1][0] - '0'];
-              cfg->r2 = rotors->r[argv[i + 1][1] - '0'];
-              cfg->r3 = rotors->r[argv[i + 1][2] - '0'];
+              cfg->r1 = rotors->r[argv[i + 1][0] - '1'];
+              cfg->r2 = rotors->r[argv[i + 1][1] - '1'];
+              cfg->r3 = rotors->r[argv[i + 1][2] - '1'];
 
 	      // since two arguemnts are used, we increment i an extra time
               i++;
@@ -223,14 +223,14 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                   "which\n"
                   "		        can be in 1 of 26 positions\n"
                   "			  default is '-n1 5 -n2 10'\n"
-                  "  --Config=file		select a file to load "
-                  "Configurations "
-                  "from\n"
+                  //"  --Config=file		select a file to load "
+                  //"Configurations "
+                  //"from\n"
                   //	    "  -v			verbose output\n"
-                  "  -o 			select a file to use as "
-                  "output\n"
-                  "  -f 			select a file to load as "
-                  "input\n"
+                  //"  -o 			select a file to use as "
+                  //"output\n"
+                  //"  -f 			select a file to load as "
+                  //"input\n"
                   "  -h			show this help message\n");
               return 1;
               break;
