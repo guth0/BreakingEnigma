@@ -13,9 +13,7 @@ isValidPlugboard (char *arr)
       if ((arr[c - 'A'] != i + 'A') && (c != i + 'A'))
         {
           return 1;
-        }
-    }
-
+        } }
   return 0;
 }
 
@@ -72,9 +70,7 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                   return 2;
                 }
 
-              cfg->plugboard = (char *)malloc (27 * sizeof (char));
-              strncpy (cfg->plugboard, argv[i + 1], 26);
-              cfg->plugboard[27] = '\0';
+              memcpy(cfg->plugboard, argv[i + 1], 26);
 
 
 	      // since two arguemnts are used, we increment i an extra time
@@ -92,9 +88,11 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                 }
 
 	      // sets the rotors to the selected ones
-              cfg->r1 = rotors->r[argv[i + 1][0] - '1'];
-              cfg->r2 = rotors->r[argv[i + 1][1] - '1'];
-              cfg->r3 = rotors->r[argv[i + 1][2] - '1'];
+              memcpy(cfg->r1, rotors->r[argv[i + 1][0] - '1'], 27);
+              memcpy(cfg->r2, rotors->r[argv[i + 1][1] - '1'], 27);
+              memcpy(cfg->r3, rotors->r[argv[i + 1][2] - '1'], 27);
+
+      
 
 	      // since two arguemnts are used, we increment i an extra time
               i++;
@@ -107,7 +105,7 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                 case '2':
 
 		  // changes the rotor to the selected one
-                  cfg->rfl = rotors->rfl[argv[i+1][0] - '1'];
+                  memcpy(cfg->rfl, rotors->rfl[argv[i+1][0] - '1'], 27);
 
                   break;
                 default:
@@ -303,11 +301,11 @@ main (int argc, char *argv[])
   struct Config cfg;
 
   // copy in default cyphers
-  cfg.r1 = ROTOR_1;
-  cfg.r2 = ROTOR_2;
-  cfg.r3 = ROTOR_3;
-  cfg.rfl = REFLECTOR_1;
-  cfg.plugboard = ALPHABET;
+  memcpy(cfg.r1, ROTOR_1, 27);
+  memcpy(cfg.r2, ROTOR_2, 27);
+  memcpy(cfg.r3, ROTOR_3, 27);
+  memcpy(cfg.rfl, REFLECTOR_1, 27);
+  memcpy(cfg.plugboard, ALPHABET, 27);
 
   // Random Default Values
   cfg.r1pos = 0;
@@ -320,6 +318,9 @@ main (int argc, char *argv[])
   //  cfg.verbose = 0;
 
   char retVal = parseArgs (argc, argv, &cfg, &string, &rotors);
+
+  // create inverted rotors
+  invertConfig(&cfg);
 
   if (retVal != 0)
     {
