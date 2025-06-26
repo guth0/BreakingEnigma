@@ -6,19 +6,40 @@
 
 struct Config {
   // The arrays themselves are const but not the pointers
-  const char *r1; // [27]
-  const char *r2;
-  const char *r3;
-  const char *rfl;
+  char r1[27]; 
+  char r2[27];
+  char r3[27];
+  char rfl[27];
+
+  // inverted rotors
+  char inv_r1[27];
+  char inv_r2[27];
+  char inv_r3[27];
+
+  char plugboard[27];
+
+  int r1pos, r2pos, r3pos;
+
+  int notch1, notch2;
+};
+
+struct FastConfig {
+  // The arrays themselves are const but not the pointers
+  char *r1; // [27]
+  char *r2;
+  char *r3;
+  char *rfl;
+
+  // inverted rotors
+  char *inv_r1; // [27]
+  char *inv_r2;
+  char *inv_r3;
 
   char *plugboard;
 
-  int r1pos;
-  int r2pos;
-  int r3pos;
+  int r1pos, r2pos, r3pos;
 
-  int notch1;
-  int notch2;
+  int notch1, notch2;
 };
 
 struct Rotors {
@@ -27,7 +48,28 @@ struct Rotors {
   char *rfl[2];
 };
 
-int getRotorNum(const char *r, const struct Rotors *rotors) {
+struct FastRotors {
+  char *r[5];
+
+  char *inv_r[5];
+
+  char *rfl[2];
+};
+
+void invertRotor(const char *r, char *inverse) {
+  inverse[26] = '\0';
+  for (int i = 0; i < 26; ++i) {
+    inverse[r[i]] = i;
+  }
+}
+
+void invertConfig(struct Config *cfg) {
+  invertRotor(cfg->r1, cfg->inv_r1);
+  invertRotor(cfg->r2, cfg->inv_r2);
+  invertRotor(cfg->r3, cfg->inv_r3);
+}
+
+int getRotorNum(const char *r, const struct FastRotors *rotors) {
 
   for (int i = 0; i < 5; ++i) {
     if (r == rotors->r[i]) {
@@ -40,7 +82,7 @@ int getRotorNum(const char *r, const struct Rotors *rotors) {
   return -1;
 }
 
-int getReflectorNum(const char *r, const struct Rotors *rotors) {
+int getReflectorNum(const char *r, const struct FastRotors *rotors) {
 
   // just did an IF statement here b/c only two cases
   if (r == rotors->rfl[0]) {
@@ -53,7 +95,7 @@ int getReflectorNum(const char *r, const struct Rotors *rotors) {
   return -1;
 }
 
-void printConfig(const struct Config *cfg, const struct Rotors *rotors) {
+void printConfig(const struct FastConfig *cfg, const struct FastRotors *rotors) {
 
   // declare num to hold our
   int num;
