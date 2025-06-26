@@ -5,7 +5,10 @@
 #include <time.h>
 #include <x86intrin.h> // For __rdtsc()
 
-#define NUM_RUNS 10000000
+#define NUM_RUNS 1000000
+
+#define NUM_CHARS 1
+// Number of chars in the plaintext
 
 // Serialize rdtsc using cpuid
 static inline uint64_t rdtsc_start() {
@@ -45,14 +48,13 @@ int main() {
 
   char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  for (int i = 0; i < 26; ++i)
-    {
-      REFLECTOR_1[i] -= 'A';
-      ALPHABET[i] -= 'A';
-      ROTOR_1[i] -= 'A';
-      ROTOR_2[i] -= 'A';
-      ROTOR_3[i] -= 'A';
-    }
+  for (int i = 0; i < 26; ++i) {
+    REFLECTOR_1[i] -= 'A';
+    ALPHABET[i] -= 'A';
+    ROTOR_1[i] -= 'A';
+    ROTOR_2[i] -= 'A';
+    ROTOR_3[i] -= 'A';
+  }
 
   char *string;
 
@@ -72,16 +74,22 @@ int main() {
   cfg.notch1 = 5;
   cfg.notch2 = 10;
 
-  char *str = "A";
-                    
-  invertConfig(&cfg);
+  // fill plaintext with random letters so there is no pattern
+  srand(time(NULL));
+  char *plaintext = (char *)malloc(NUM_CHARS * sizeof(char));
+  for (int i = 0; i < NUM_CHARS; i++)
+  {
+    plaintext[i] = 'A' + (rand() % 26);
+  }
+
+    invertConfig(&cfg);
   // FUNCTION SETUP (end)
 
   for (int i = 0; i < NUM_RUNS; i++) {
     uint64_t start_us = get_time_us();
     uint64_t start_cycles = rdtsc_start();
 
-    target_function(str, &cfg);
+    target_function(plaintext, &cfg);
 
     uint64_t end_cycles = rdtsc_end();
     uint64_t end_us = get_time_us();
@@ -95,7 +103,8 @@ int main() {
 
   printf("Average CPU cycles: %llu\n",
          (unsigned long long)(total_cycles / NUM_RUNS));
-  printf("Average time: %llu µs\n", (unsigned long long)(total_us / NUM_RUNS));
+  printf("Average time: %Lf µs\n",
+         (long double)(total_us / (long double)NUM_RUNS));
 
   return 0;
 }
