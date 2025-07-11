@@ -3,6 +3,9 @@
 #include "../util/config.h"
 #include "enigma.h"
 
+
+// checks if the given plugboard is valid
+// 	- there are only 1 to 1 swaps
 char
 isValidPlugboard (char *arr)
 {
@@ -10,6 +13,7 @@ isValidPlugboard (char *arr)
   for (int i = 0; i < 26; ++i)
     {
       char c = arr[i];
+      // makes sure that there are only 1 to 1 swaps
       if ((arr[c - 'A'] != i + 'A') && (c != i + 'A'))
         {
           return 1;
@@ -26,6 +30,7 @@ isNumber (char *arr)
 
   for (int i = 0; i < strlen (arr); ++i)
     {
+      // checks if each char is a number
       if (arr[i] > '9' || arr[i] < '0')
         {
           return 1;
@@ -53,25 +58,28 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
 
   for (int i = 1; i < argc; ++i)
     {
-      //    printf("ARGUMENT: %s", argv[i]);
 
       if (argv[i][0] == '-')
         {
           switch (argv[i][1])
             {
+	    // plugboard
             case 'b':
+	      // fail if it is not 26 char long
               if (strlen (argv[i + 1]) != 26)
                 {
                   fprintf (stderr, "Invalid Pugboard Cypher Length '%lu'\n",
                            strlen (argv[i + 1]));
                   return 2;
                 }
+	      // fail if not valid plugboard
               if (isValidPlugboard (argv[i + 1]) != 0)
                 {
                   fprintf (stderr, "Pluboard Cypher is Invalid\n");
                   return 2;
                 }
 
+	      // put the plugboard in the config
               cfg->plugboard = (char *)malloc (27 * sizeof (char));
               strncpy (cfg->plugboard, argv[i + 1], 26);
               cfg->plugboard[27] = '\0';
@@ -80,9 +88,11 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
 	      // since two arguemnts are used, we increment i an extra time
               i++;
               break;
+	    // rotors (all 3 in one arg)
             case 'r':
               for (int j = 0; j < 3; ++j)
                 {
+		  // if not 1-5, then fail
                   if (argv[i + 1][j] > '5' || argv[i + 1][j] < '1')
                     {
                       fprintf (stderr, "Invalid Rotor Number '%c'\n",
@@ -99,6 +109,7 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
 	      // since two arguemnts are used, we increment i an extra time
               i++;
               break;
+	    // reflector
             case 'e':
 
               switch (argv[i + 1][0])
@@ -110,6 +121,8 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                   cfg->rfl = rotors->rfl[argv[i+1][0] - '1'];
 
                   break;
+
+		// if not 1 or 2, then fail
                 default:
                   fprintf (stderr, "Invalid Reflector Number '%c'\n",
                            argv[i + 1][0]);
@@ -119,7 +132,10 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
 	      // since two arguemnts are used, we increment i an extra time
               i++;
               break;
+	    // rotor position (inital rotation)
             case 'p':
+
+	      // set ptr to the correct rotor position var
               switch (argv[i][2])
                 {
                 case '1':
@@ -131,11 +147,14 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                 case '3':
                   ptr = &cfg->r3pos;
                   break;
+		
+		// if not 1 2 or 3, then fail
                 default:
                   fprintf (stderr, "Invalid Rotor Number '%s'\n", argv[i]);
                   return 5;
                 }
 
+	      // if not a number, fail
               if (isNumber (argv[i + 1]) != 0)
                 {
                   fprintf (stderr, "Invalid Rotor Position Format '%s'\n",
@@ -145,14 +164,19 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
 
               *ptr = atoi (argv[i + 1]);
 
+
+	      // if not 0 - 25, fail
               if (*ptr > 25 || *ptr < 0)
                 {
                   fprintf (stderr, "Invalid Rotor Position '%d'\n", *ptr);
                   return 5;
                 }
               break;
+
+	    // notches
             case 'n':
 
+	      // set ptr to the correct notch var
               switch (argv[i][2])
                 {
                 case '1':
@@ -161,6 +185,8 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
                 case '2':
                   ptr = &cfg->notch2;
                   break;
+
+		// if not 1 or 2, fail
                 default:
                   fprintf (stderr, "Invalid Notch Number '%s'\n", argv[i]);
                   return 6;
@@ -175,6 +201,7 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
 
               *ptr = atoi (argv[i + 1]);
 
+	      // if not 0 - 25, fail
               if (*ptr > 25 || *ptr < 0)
                 {
                   fprintf (stderr, "Invalid Notch Position '%d'\n", *ptr);
@@ -192,10 +219,12 @@ parseArgs (int argc, char *argv[], struct Config *cfg, char **string,
               return 10;
 
               break;
+	    // all "--" cases here
             case '-':
               fprintf (stderr, "Config files are not yet supported\n");
               return 10;
               break;
+	    // help
             case 'h':
 
               printf (
@@ -268,11 +297,14 @@ main (int argc, char *argv[])
   char ROTOR_4[27] = "KCPXSYOMZRTLEVFWUNAIQGHBDJ";
   char ROTOR_5[27] = "LZIJTBYNREOAPUVDWHXCKQMGFS";
 
+  // Initalize Reflectors
   char REFLECTOR_1[27] = "COAHIJRDEFQZWYBUKGXVPTMSNL";
   char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
 
+  // Alphabet for defualt plugboard
   char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+  // decrement everything by 'A' to get position values 
   for (int i = 0; i < 26; ++i)
     {
       REFLECTOR_1[i] -= 'A';
@@ -285,6 +317,7 @@ main (int argc, char *argv[])
       ROTOR_5[i] -= 'A';
     }
 
+  // fill up rotors struct
   static struct Rotors rotors;
 
   rotors.r[0] = ROTOR_1;
@@ -300,6 +333,7 @@ main (int argc, char *argv[])
 
   char *string;
 
+  // Initalize conifg
   struct Config cfg;
 
   // copy in default cyphers
@@ -319,8 +353,10 @@ main (int argc, char *argv[])
   // flags
   //  cfg.verbose = 0;
 
+  // parse command line args
   char retVal = parseArgs (argc, argv, &cfg, &string, &rotors);
 
+  // fail code
   if (retVal != 0)
     {
       return retVal;
@@ -341,11 +377,14 @@ main (int argc, char *argv[])
       printf("n1: %d, n2: %d\n", cfg.notch1, cfg.notch2);
     } */
 
+  // do encryption
   char *output;
   output = Enigma (string, &cfg);
 
+  // print out result
   printf ("%s\n", output);
 
+  // free memory
   free (string);
   free (output);
 

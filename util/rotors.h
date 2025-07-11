@@ -15,6 +15,7 @@ void spinRotors(int *r1count, int *r2count, int *r3count, const int notch1,
   *r1count = (*r1count + 1) % 26;
 }
 
+// find the position of a character in the alphabet
 char alphabetIndex(char target) {
   if (target >= 'A' && target <= 'Z') {
     return target - 'A';
