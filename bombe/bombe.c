@@ -26,15 +26,12 @@ char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
 char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 int shortEnigma(char *crib, char *cypher, struct FastConfig *cfg) {
-
   for (int i = 0; i < strlen(crib); i++) {
-
     char letter = crib[i];
     char index = alphabetIndex(letter);
 
     // if non-alphabetical:
     if (index == -1) {
-
       if (index != cypher[i]) {
         return 0;
       }
@@ -50,7 +47,7 @@ int shortEnigma(char *crib, char *cypher, struct FastConfig *cfg) {
     index = cfg->r2[(index - cfg->r2pos + 26) % 26];
     index = cfg->r3[(index - cfg->r3pos + 26) % 26];
 
-    index = cfg->rfl[index]; // reflector
+    index = cfg->rfl[index];  // reflector
 
     index = (cfg->inv_r3[index] + cfg->r3pos) % 26;
     index = (cfg->inv_r2[index] + cfg->r2pos) % 26;
@@ -77,7 +74,6 @@ int shortEnigma(char *crib, char *cypher, struct FastConfig *cfg) {
 // 	returns 1 if encyrpted crib = cypher, 0 if not
 //
 int testRotors(char *crib, char *cypher, struct FastConfig *cfg) {
-
   // go over every rotation and notch combo in a loop here
 
   // if ((notch1 - r1pos + 26) % 26 < cribLen), notch1 will hit
@@ -101,22 +97,19 @@ int testRotors(char *crib, char *cypher, struct FastConfig *cfg) {
     fixedCribLen = 26;
   }
 
-  for (int r1 = 0; r1 < 26; ++r1) // rotor 1 position
+  for (int r1 = 0; r1 < 26; ++r1)  // rotor 1 position
   {
-    for (int r2 = 0; r2 < 26; ++r2) // rotor 2 position
+    for (int r2 = 0; r2 < 26; ++r2)  // rotor 2 position
     {
-      for (int r3 = 0; r3 < 26; ++r3) // rotor 3 position
+      for (int r3 = 0; r3 < 26; ++r3)  // rotor 3 position
       {
-
         for (int i1 = 0; i1 < fixedCribLen; ++i1) {
-
           int n1 = (r1 + i1) % 26;
 
           int notch1Hits =
               (int)(strlen(crib) / 26 + ((n1 - r1 + 26) % 26 < strlen(crib)));
 
           for (int i2 = 0; i2 <= notch1Hits + 3; ++i2) {
-
             int n2 = (r2 + i2) % 26;
 
             // apply settings (needs to be here b/c
@@ -133,7 +126,6 @@ int testRotors(char *crib, char *cypher, struct FastConfig *cfg) {
             int out = shortEnigma(crib, cypher, cfg);
 
             if (out == 1) {
-
               // reset settings and return
 
               cfg->r1pos = r1;
@@ -172,7 +164,6 @@ int testPermutation(int rotorNum1, int rotorNum2, int rotorNum3,
 // 5 * 4 * 3 = 60 rotor Configurations
 int permuteRotors(char *crib, char *cypher, const struct FastRotors *rotors,
                   struct FastConfig *cfg) {
-
   for (int i = 0; i < 5; ++i) {
     for (int j = 0; j < 5; ++j) {
       if (i == j) {
@@ -196,7 +187,6 @@ int permuteRotors(char *crib, char *cypher, const struct FastRotors *rotors,
 }
 
 int main(int argc, char *argv[]) {
-
   // For development only:
 
   if (argc != 3) {
@@ -227,23 +217,15 @@ int main(int argc, char *argv[]) {
   rotors.r[3] = ROTOR_4;
   rotors.r[4] = ROTOR_5;
 
-  char INV_R_1[27];
-  char INV_R_2[27];
-  char INV_R_3[27];
-  char INV_R_4[27];
-  char INV_R_5[27];
+  // INV_R is a large string that holds all the inverted rotors in sequence
+  // seperated by null terminators
+  char INV_R[27 * 5];
+  for (int i = 0; i < 5; i++) {
+    INV_R[(i + 1) * 27] = '\0';                  // add null terminator
+    invertRotor(rotors.r[i], INV_R + (i * 27));  // fill in inverse
 
-  invertRotor(ROTOR_1, INV_R_1);
-  invertRotor(ROTOR_2, INV_R_2);
-  invertRotor(ROTOR_3, INV_R_3);
-  invertRotor(ROTOR_4, INV_R_4);
-  invertRotor(ROTOR_5, INV_R_5);
-
-  rotors.inv_r[0] = INV_R_1;
-  rotors.inv_r[1] = INV_R_2;
-  rotors.inv_r[2] = INV_R_3;
-  rotors.inv_r[3] = INV_R_4;
-  rotors.inv_r[4] = INV_R_5;
+    rotors.inv_r[i] = INV_R + (i * 27);  // add pointer to FastRotors object
+  }
 
   rotors.rfl[0] = REFLECTOR_1;
   rotors.rfl[1] = REFLECTOR_2;
@@ -259,7 +241,6 @@ int main(int argc, char *argv[]) {
   printf("Cypher: '%s'\nCrib: '%s'\n", cypher, crib);
 
   // shuffle rotors and call testRotors on each
-
   struct FastConfig cfg;
 
   // call permute twice, once with each reflector
@@ -270,7 +251,7 @@ int main(int argc, char *argv[]) {
   if (ret == 1) {
     printConfig(&cfg, &rotors);
   } else {
-    // if fail, call again with the other rotor
+    // if fail, call again with the other reflector
     cfg.rfl = REFLECTOR_2;
 
     ret = permuteRotors(crib, cypher, &rotors, &cfg);
