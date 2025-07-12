@@ -7,7 +7,6 @@
 #include "stdlib.h"
 #include "string.h"
 
-
 char *Enigma(char *string, struct Config *cfg) {
 
   char *output = (char *)malloc(strlen(string) + 1);

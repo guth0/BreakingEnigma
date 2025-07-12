@@ -1,9 +1,9 @@
-#include "enigma.h"
-
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
-#include <x86intrin.h> // For __rdtsc()
+#include <x86intrin.h>  // For __rdtsc()
+
+#include "enigma.h"
 
 #define NUM_RUNS 1000000
 
@@ -77,12 +77,11 @@ int main() {
   // fill plaintext with random letters so there is no pattern
   srand(time(NULL));
   char *plaintext = (char *)malloc(NUM_CHARS * sizeof(char));
-  for (int i = 0; i < NUM_CHARS; i++)
-  {
+  for (int i = 0; i < NUM_CHARS; i++) {
     plaintext[i] = 'A' + (rand() % 26);
   }
 
-    invertConfig(&cfg);
+  invertConfig(&cfg);
   // FUNCTION SETUP (end)
 
   for (int i = 0; i < NUM_RUNS; i++) {

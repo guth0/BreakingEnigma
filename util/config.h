@@ -6,7 +6,7 @@
 
 struct Config {
   // The arrays themselves are const but not the pointers
-  char r1[27]; 
+  char r1[27];
   char r2[27];
   char r3[27];
   char rfl[27];
@@ -95,7 +95,8 @@ int getReflectorNum(const char *r, const struct FastRotors *rotors) {
   return -1;
 }
 
-void printConfig(const struct FastConfig *cfg, const struct FastRotors *rotors) {
+void printConfig(const struct FastConfig *cfg,
+                 const struct FastRotors *rotors) {
 
   // declare num to hold our
   int num;
