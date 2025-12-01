@@ -29,57 +29,43 @@ char REFLECTOR_2[27] = "WKPZGHEFVQBXRYUCJMTSOIALND";
 // (plugboard == alphabet) => No plugs
 char ALPHABET[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-int
-shortEnigma (char *crib, char *cypher, struct Config *cfg)
-{
+int shortEnigma(char* crib, char* cypher, struct FastConfig* cfg) {
+  for (int i = 0; i < strlen(crib); i++) {
+    char letter = crib[i];
+    char index = alphabetIndex(letter);
 
-  // loop over every character
-  for (int i = 0; i < strlen (crib); i++)
-    {
+    // if non-alphabetical:
+    if (index == -1) {
+      if (index != cypher[i]) {
+        return 0;
+      }
 
-      char letter = crib[i];
-      char index = alphabetIndex (letter);
-
-      // if non-alphabetical:
-      if (index == -1)
-        {
-
-          if (index != cypher[i])
-            {
-              return 0;
-            }
-
-          continue;
-        }
-
-      // Send through Enigma
-
-      // index = cfg->plugboard[index];
-
-      // forwards through rotors
-      index = cfg->r1[(index - cfg->r1pos + 26) % 26];
-      index = cfg->r2[(index - cfg->r2pos + 26) % 26];
-      index = cfg->r3[(index - cfg->r3pos + 26) % 26];
-
-      index = cfg->rfl[index]; // reflector
-
-      // backwards through rotors
-      index = (rotorIndex (cfg->r3, index) + cfg->r3pos) % 26;
-      index = (rotorIndex (cfg->r2, index) + cfg->r2pos) % 26;
-      index = (rotorIndex (cfg->r1, index) + cfg->r1pos) % 26;
-
-      // index = cfg->plugboard[index];
-
-      // check for match
-      if (cypher[i] != index + 'A')
-        {
-          // if no match, return False (0)
-          return 0;
-        }
-
-      spinRotors (&cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1,
-                  cfg->notch2);
+      continue;
     }
+
+    // Send through Enigma
+
+    // index = cfg->plugboard[index];
+
+    index = cfg->r1[(index - cfg->r1pos + 26) % 26];
+    index = cfg->r2[(index - cfg->r2pos + 26) % 26];
+    index = cfg->r3[(index - cfg->r3pos + 26) % 26];
+
+    index = cfg->rfl[index];  // reflector
+
+    index = (cfg->inv_r3[index] + cfg->r3pos) % 26;
+    index = (cfg->inv_r2[index] + cfg->r2pos) % 26;
+    index = (cfg->inv_r1[index] + cfg->r1pos) % 26;
+
+    // index = cfg->plugboard[index];
+
+    // check for match
+    if (cypher[i] != index + 'A') {
+      return 0;
+    }
+
+    spinRotors(&cfg->r1pos, &cfg->r2pos, &cfg->r3pos, cfg->notch1, cfg->notch2);
+  }
 
   // if the entire loop finishes with no missmatches, then return True (1)
   return 1;
@@ -90,10 +76,7 @@ shortEnigma (char *crib, char *cypher, struct Config *cfg)
 // 	stops at the first incorrect letter
 // 	returns 1 if encyrpted crib = cypher, 0 if not
 //
-int
-testRotors (char *crib, char *cypher, struct Config *cfg)
-{
-
+int testRotors(char* crib, char* cypher, struct FastConfig* cfg) {
   // go over every rotation and notch combo in a loop here
 
   // if ((notch1 - r1pos + 26) % 26 < cribLen), notch1 will hit
@@ -111,71 +94,56 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
   // Rotor Loop
 
   // If strlen(crib) > 26, then we will have repeated notches.
-  int fixedCribLen = strlen (crib);
+  int fixedCribLen = strlen(crib);
 
-  if (fixedCribLen > 26)
+  if (fixedCribLen > 26) {
+    fixedCribLen = 26;
+  }
+
+  for (int r1 = 0; r1 < 26; ++r1)  // rotor 1 position
+  {
+    for (int r2 = 0; r2 < 26; ++r2)  // rotor 2 position
     {
-      fixedCribLen = 26;
-    }
+      for (int r3 = 0; r3 < 26; ++r3)  // rotor 3 position
+      {
+        for (int i1 = 0; i1 < fixedCribLen; ++i1) {
+          int n1 = (r1 + i1) % 26;
 
-  for (int r1 = 0; r1 < 26; ++r1) // rotor 1 position
-    {
-      for (int r2 = 0; r2 < 26; ++r2) // rotor 2 position
-        {
-          for (int r3 = 0; r3 < 26; ++r3) // rotor 3 position
-            {
+          int notch1Hits =
+              (int)(strlen(crib) / 26 + ((n1 - r1 + 26) % 26 < strlen(crib)));
 
-              for (int i1 = 0; i1 < fixedCribLen; ++i1)
-                {
+          for (int i2 = 0; i2 <= notch1Hits + 3; ++i2) {
+            int n2 = (r2 + i2) % 26;
 
-                  int n1 = (r1 + i1) % 26;
+            // apply settings (needs to be here b/c
+            //  		 shortEnigma changes it)
+            cfg->r1pos = r1;
+            cfg->r2pos = r2;
+            cfg->r3pos = r3;
 
-                  // this is overestimate
-                  // some of these runs will give the same encrypted crib
-                  int notch1Hits
-                      = ((int)(strlen (crib) / 26
-                               + ((n1 - r1 + 26) % 26 < strlen (crib))))
-                        + 3;
-                  // the "+3" is just to make sure we hit the correct number
-                  // if the rest of the equation is correct, it shouldn't exist
+            cfg->notch2 = n2;
+            cfg->notch1 = n1;
+            // Need to handle the case where the cfg that works is
+            // one where the notch doesn't matter
 
-                  for (int i2 = 0; i2 <= notch1Hits; ++i2)
-                    {
+            int out = shortEnigma(crib, cypher, cfg);
 
-                      int n2 = (r2 + i2) % 26;
+            if (out == 1) {
+              // reset settings and return
 
-                      // apply settings (needs to be here b/c
-                      //  		 shortEnigma changes it)
-                      cfg->r1pos = r1;
-                      cfg->r2pos = r2;
-                      cfg->r3pos = r3;
+              cfg->r1pos = r1;
+              cfg->r2pos = r2;
+              cfg->r3pos = r3;
 
-                      cfg->notch2 = n2;
-                      cfg->notch1 = n1;
-                      // Need to handle the case where the cfg that works is
-                      // one where the notch doesn't matter
-
-                      int out = shortEnigma (crib, cypher, cfg);
-
-                      // if the encrypted crib matches the cypher:
-                      if (out == 1)
-                        {
-
-                          // reset settings and return
-
-                          cfg->r1pos = r1;
-                          cfg->r2pos = r2;
-                          cfg->r3pos = r3;
-
-                          cfg->notch1 = n1;
-                          cfg->notch2 = n2;
-                          return 1;
-                        }
-                    }
-                }
+              cfg->notch1 = n1;
+              cfg->notch2 = n2;
+              return 1;
             }
+          }
         }
+      }
     }
+  }
 
   // No matching Config found
   return 0;
@@ -183,64 +151,53 @@ testRotors (char *crib, char *cypher, struct Config *cfg)
 
 // given 3 numbers, set the rotors to those numbers in that order.
 // eg. 1, 3, 4 -> rotor 1, rotor 3, rotor 4
-int
-testPermutation (int rotorNum1, int rotorNum2, int rotorNum3,
-                 const struct Rotors *rotors, struct Config *cfg, char *crib,
-                 char *cypher)
-{
+int testPermutation(int rotorNum1, int rotorNum2, int rotorNum3,
+                    const struct FastRotors* rotors, struct FastConfig* cfg,
+                    char* crib, char* cypher) {
   // set rotors
   cfg->r1 = rotors->r[rotorNum1];
   cfg->r2 = rotors->r[rotorNum2];
   cfg->r3 = rotors->r[rotorNum3];
 
-  return testRotors (crib, cypher, cfg);
+  cfg->inv_r1 = rotors->inv_r[rotorNum1];
+  cfg->inv_r2 = rotors->inv_r[rotorNum2];
+  cfg->inv_r3 = rotors->inv_r[rotorNum3];
+
+  return testRotors(crib, cypher, cfg);
 }
 
 // set the premutation of the rotors
-int
-permuteRotors (char *crib, char *cypher, const struct Rotors *rotors,
-               struct Config *cfg)
-{
-
-  for (int i = 0; i < 5; ++i)
-    {
-      for (int j = 0; j < 5; ++j)
-        {
-          if (i == j)
-            {
-              continue;
-            }
-
-          for (int k = 0; k < 5; ++k)
-            {
-              if (k == i || k == j)
-                {
-                  continue;
-                }
-
-              int ret = testPermutation (i, j, k, rotors, cfg, crib, cypher);
-
-              if (ret == 1)
-                {
-                  return 1;
-                }
-            }
+// 5 * 4 * 3 = 60 rotor Configurations
+int permuteRotors(char* crib, char* cypher, const struct FastRotors* rotors,
+                  struct FastConfig* cfg) {
+  for (int i = 0; i < 5; ++i) {
+    for (int j = 0; j < 5; ++j) {
+      if (i == j) {
+        continue;
+      }
+      for (int k = 0; k < 5; ++k) {
+        if (k == i || k == j) {
+          continue;
         }
+
+        int ret = testPermutation(i, j, k, rotors, cfg, crib, cypher);
+
+        if (ret == 1) {
+          return 1;
+        }
+      }
     }
+  }
   return 0;
 }
 
-int
-main (int argc, char *argv[])
-{
-
+int main(int argc, char* argv[]) {
   // For development only:
 
-  if (argc != 3)
-    {
-      fprintf (stderr, "Invalid Argument count '%d'", argc);
-      return 1;
-    }
+  if (argc != 3) {
+    fprintf(stderr, "Invalid Argument count '%d'", argc);
+    return 1;
+  }
 
   // make sure that the crib is shorter than the cypher
 
@@ -248,19 +205,18 @@ main (int argc, char *argv[])
 
   // We don't want actual characters, we just want their positions in the
   // alphabet for quicker computation
-  for (int i = 0; i < 26; ++i)
-    {
-      REFLECTOR_1[i] -= 'A';
-      REFLECTOR_2[i] -= 'A';
-      ALPHABET[i] -= 'A';
-      ROTOR_1[i] -= 'A';
-      ROTOR_2[i] -= 'A';
-      ROTOR_3[i] -= 'A';
-      ROTOR_4[i] -= 'A';
-      ROTOR_5[i] -= 'A';
-    }
+  for (int i = 0; i < 26; ++i) {
+    REFLECTOR_1[i] -= 'A';
+    REFLECTOR_2[i] -= 'A';
+    ALPHABET[i] -= 'A';
+    ROTOR_1[i] -= 'A';
+    ROTOR_2[i] -= 'A';
+    ROTOR_3[i] -= 'A';
+    ROTOR_4[i] -= 'A';
+    ROTOR_5[i] -= 'A';
+  }
 
-  static struct Rotors rotors;
+  static struct FastRotors rotors;
 
   rotors.r[0] = ROTOR_1;
   rotors.r[1] = ROTOR_2;
@@ -268,58 +224,61 @@ main (int argc, char *argv[])
   rotors.r[3] = ROTOR_4;
   rotors.r[4] = ROTOR_5;
 
+  // INV_R is a large string that holds all the inverted rotors in sequence
+  // seperated by null terminators
+  char INV_R[27 * 5];
+  for (int i = 0; i < 5; i++) {
+    INV_R[(i + 1) * 27] = '\0';                  // add null terminator
+    invertRotor(rotors.r[i], INV_R + (i * 27));  // fill in inverse
+
+    rotors.inv_r[i] = INV_R + (i * 27);  // add pointer to FastRotors object
+  }
+
   rotors.rfl[0] = REFLECTOR_1;
   rotors.rfl[1] = REFLECTOR_2;
 
   // check size of crib
-  if (strlen (argv[1]) > 4096)
-    {
-      fprintf (stderr, "Crib must be less than 4096 bytes\n");
-      return 2;
-    }
+  if (strlen(argv[1]) > 4096) {
+    fprintf(stderr, "Crib must be less than 4096 bytes\n");
+    return 2;
+  }
 
   // make enough space for the crib and cypher
-  char *crib = (char *)malloc (sizeof (char) * strlen (argv[1]));
-  char *cypher = (char *)malloc (sizeof (char) * strlen (argv[1]));
+  char* crib = (char*)malloc(sizeof(char) * strlen(argv[1]));
+  char* cypher = (char*)malloc(sizeof(char) * strlen(argv[1]));
 
   // since I am only checking if the crib is at the very start of the cypher,
   // I only need the first X characters of the cypher to compare with the crib
-  strcpy (crib, argv[1]);
-  strncpy (cypher, argv[2], strlen (argv[1]));
+  strcpy(crib, argv[1]);
+  strncpy(cypher, argv[2], strlen(argv[1]));
+
+  printf("Cypher: '%s'\nCrib: '%s'\n", cypher, crib);
 
   // shuffle rotors and call testRotors on each
-  struct Config cfg;
+  struct FastConfig cfg;
 
   // call permute twice, once with each reflector
   cfg.rfl = REFLECTOR_1;
 
-  int ret = permuteRotors (crib, cypher, &rotors, &cfg);
+  int ret = permuteRotors(crib, cypher, &rotors, &cfg);
 
-  if (ret == 1)
-    {
-      printConfig (&cfg, &rotors);
+  if (ret == 1) {
+    printConfig(&cfg, &rotors);
+  } else {
+    // if fail, call again with the other reflector
+    cfg.rfl = REFLECTOR_2;
+
+    ret = permuteRotors(crib, cypher, &rotors, &cfg);
+
+    if (ret == 1) {
+      printConfig(&cfg, &rotors);
+    } else {
+      printf("No working config found\n");
     }
-  else
-    {
-      // if fail, call again with the other rotor
-      cfg.rfl = REFLECTOR_2;
+  }
 
-      ret = permuteRotors (crib, cypher, &rotors, &cfg);
+  free(crib);
+  free(cypher);
 
-      // if success
-      if (ret == 1)
-        {
-          printConfig (&cfg, &rotors);
-        }
-      // if failure
-      else
-        {
-          printf ("No working config found\n");
-        }
-    }
-
-  free (crib);
-  free (cypher);
-
-  return 0;
+return 0;
 }

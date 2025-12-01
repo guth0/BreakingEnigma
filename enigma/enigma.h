@@ -24,8 +24,6 @@ char *Enigma(char *string, struct Config *cfg) {
       continue;
     }
 
-    // printf("p1: %d, p2: %d, p3: %d\n", cfg->r1pos, cfg->r2pos, cfg->r3pos);
-
     // plugboard forwards
     index = cfg->plugboard[index];
 
@@ -38,11 +36,11 @@ char *Enigma(char *string, struct Config *cfg) {
     index = cfg->rfl[index];
 
     // rotors backward
-    index = (rotorIndex(cfg->r3, index) + cfg->r3pos) % 26;
-    index = (rotorIndex(cfg->r2, index) + cfg->r2pos) % 26;
-    index = (rotorIndex(cfg->r1, index) + cfg->r1pos) % 26;
+    index = (cfg->inv_r3[index] + cfg->r3pos) % 26;
+    index = (cfg->inv_r2[index] + cfg->r2pos) % 26;
+    index = (cfg->inv_r1[index] + cfg->r1pos) % 26;
 
-    // plugboard backwards 
+    // plugboard backwards
     // (It is symetric so it is the same as forwards)
     index = cfg->plugboard[index];
 

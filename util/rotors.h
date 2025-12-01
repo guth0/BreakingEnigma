@@ -26,16 +26,6 @@ char alphabetIndex(char target) {
   }
 }
 
-char rotorIndex(const char *rotor, char target) {
-  for (int i = 0; i < 26; ++i) {
-    if (target == rotor[i]) {
-      return i;
-    }
-  }
-
-  return -1;
-}
-
 void printRotor(const char *arr) {
   for (int i = 0; i < 26; ++i) {
     printf("%c", arr[i] + 'A');
